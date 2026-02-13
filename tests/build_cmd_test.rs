@@ -15,7 +15,7 @@ fn temci_bin() -> String {
 }
 
 #[test]
-fn test_build_with_compiler_flag() {
+fn test_build_with_compiler_and_opt_level_flags() {
     let output = Command::new(temci_bin())
         .args(["build", "--compiler", "gcc", "--opt-level", "O3"])
         .output()

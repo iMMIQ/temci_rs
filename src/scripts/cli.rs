@@ -163,7 +163,7 @@ impl TemciCli {
                 Self::handle_short_exec(commands, runs, warmup, summary, output, no_save).await
             }
             Commands::Build { config, force, release, compiler, opt_level } => {
-                build_cmd::build(config, force, release, compiler, opt_level).await
+                Self::handle_build(config, force, release, compiler, opt_level).await
             }
             Commands::Clean { all } => {
                 Self::handle_clean(all).await
@@ -201,7 +201,6 @@ impl TemciCli {
         short_exec::short_exec(commands, runs, warmup, summary, output, no_save).await
     }
 
-    #[allow(dead_code)]
     async fn handle_build(
         config: Option<String>,
         force: bool,
@@ -209,10 +208,7 @@ impl TemciCli {
         compiler: Option<String>,
         opt_level: Option<String>,
     ) -> AnyhowResult<()> {
-        tracing::info!("Build: config={:?} force={} release={} compiler={:?} opt_level={:?}",
-                       config, force, release, compiler, opt_level);
-        // Placeholder - will be implemented by build_cmd module
-        Ok(())
+        build_cmd::build(config, force, release, compiler, opt_level).await
     }
 
     async fn handle_clean(all: bool) -> AnyhowResult<()> {
