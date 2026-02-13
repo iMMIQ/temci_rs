@@ -4,6 +4,7 @@
 
 use clap::{Parser, Subcommand};
 use anyhow::Result as AnyhowResult;
+use crate::scripts::{exec, short_exec, build_cmd as build, clean, report_cmd as report, setup, completion};
 
 /// Advanced benchmarking tool
 #[derive(Parser, Debug)]
@@ -170,15 +171,13 @@ impl TemciCli {
     }
 
     async fn handle_exec(
-        _suite: Option<String>,
-        _runs: Option<usize>,
-        _driver: Option<String>,
-        _no_affinity: bool,
-        _summary: bool,
+        suite: Option<String>,
+        runs: Option<usize>,
+        driver: Option<String>,
+        no_affinity: bool,
+        summary: bool,
     ) -> AnyhowResult<()> {
-        tracing::info!("Executing benchmarks");
-        // Placeholder - will be implemented by exec module
-        Ok(())
+        exec::exec(suite, runs, driver, no_affinity, summary).await
     }
 
     async fn handle_short_exec(
