@@ -201,9 +201,7 @@ impl TemciCli {
     }
 
     async fn handle_clean(all: bool) -> AnyhowResult<()> {
-        tracing::info!("Clean: all={}", all);
-        // Placeholder - will be implemented by clean module
-        Ok(())
+        clean::clean(all).await
     }
 
     async fn handle_report(
