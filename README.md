@@ -2,6 +2,9 @@
 
 Advanced benchmarking tool - Rust implementation
 
+**语言 / Language / 語言:**
+[English](README.md) | [简体中文](README.zh.md) | [繁體粵語](README.zh-yue.md) | [日本語](README.ja.md)
+
 ## Description
 
 **temci** (Timing Execution Measuring Control and Inspection) is a comprehensive benchmarking tool for measuring and analyzing command execution performance. This is the Rust implementation of the original Python tool, providing enhanced performance and reliability.
