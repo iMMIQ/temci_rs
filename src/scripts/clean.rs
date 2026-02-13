@@ -5,10 +5,10 @@
 
 #![allow(dead_code)]
 
+use anyhow::{Context, Result};
 use std::fs;
 use std::path::{Path, PathBuf};
-use anyhow::{Result, Context};
-use tracing::{info, debug, warn};
+use tracing::{debug, info, warn};
 
 /// Clean build artifacts and temporary files
 ///
@@ -82,8 +82,7 @@ fn clean_local_temci_dir() -> Result<Vec<String>> {
     debug!("Cleaning local .temci directory");
 
     // Remove the entire directory
-    fs::remove_dir_all(temci_dir)
-        .context("Failed to remove .temci directory")?;
+    fs::remove_dir_all(temci_dir).context("Failed to remove .temci directory")?;
 
     cleaned.push(".temci/".to_string());
     Ok(cleaned)
@@ -94,8 +93,8 @@ fn clean_global_tmp_dir() -> Result<Vec<String>> {
     let mut cleaned = Vec::new();
 
     // Get home directory
-    let home_dir = dirs::home_dir()
-        .ok_or_else(|| anyhow::anyhow!("Could not determine home directory"))?;
+    let home_dir =
+        dirs::home_dir().ok_or_else(|| anyhow::anyhow!("Could not determine home directory"))?;
 
     let temci_tmp_dir = home_dir.join(".temci").join("tmp");
 

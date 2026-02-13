@@ -13,10 +13,10 @@
 //! - Outlier detection using IQR method
 //! - Sample management utilities
 
-use std::time::Duration;
+use crate::utils::time::duration_as_ms;
 use statrs::statistics::{Data, OrderStatistics, Statistics as StatrsStatistics};
 use stats_ci::Confidence;
-use crate::utils::time::duration_as_ms;
+use std::time::Duration;
 
 /// A collection of data samples for statistical analysis
 #[derive(Debug, Clone)]
@@ -32,10 +32,7 @@ impl Sample {
 
     /// Create a sample from a vector of Durations, converting to milliseconds
     pub fn from_durations(durations: Vec<Duration>) -> Self {
-        let data = durations
-            .iter()
-            .map(duration_as_ms)
-            .collect();
+        let data = durations.iter().map(duration_as_ms).collect();
         Self { data }
     }
 
@@ -223,10 +220,7 @@ impl Statistics {
 
         // Calculate variance (sample variance)
         let variance = if n > 1 {
-            let sum_squared_diff: f64 = sorted
-                .iter()
-                .map(|&x| (x - mean).powi(2))
-                .sum();
+            let sum_squared_diff: f64 = sorted.iter().map(|&x| (x - mean).powi(2)).sum();
             Some(sum_squared_diff / (n - 1) as f64)
         } else {
             Some(0.0)

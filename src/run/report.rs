@@ -109,8 +109,10 @@ impl Report {
             output.push_str(&format!("  Runs: {}\n", summary.benchmark_runs.len()));
             output.push_str(&format!("  Successful: {}\n", summary.successful_runs));
             output.push_str(&format!("  Failed: {}\n", summary.failed_runs));
-            output.push_str(&format!("  Success Rate: {:.2}%\n",
-                summary.success_rate() * 100.0));
+            output.push_str(&format!(
+                "  Success Rate: {:.2}%\n",
+                summary.success_rate() * 100.0
+            ));
 
             if let Some(min) = summary.min_duration {
                 output.push_str(&format!("  Min Duration: {:?}\n", min));
@@ -143,8 +145,10 @@ impl Report {
             output.push_str(&format!("- **Runs**: {}\n", summary.benchmark_runs.len()));
             output.push_str(&format!("- **Successful**: {}\n", summary.successful_runs));
             output.push_str(&format!("- **Failed**: {}\n", summary.failed_runs));
-            output.push_str(&format!("- **Success Rate**: {:.2}%\n",
-                summary.success_rate() * 100.0));
+            output.push_str(&format!(
+                "- **Success Rate**: {:.2}%\n",
+                summary.success_rate() * 100.0
+            ));
 
             if let Some(min) = summary.min_duration {
                 output.push_str(&format!("- **Min Duration**: `{:?}`\n", min));
@@ -183,10 +187,12 @@ impl Report {
             total_time_ms: f64,
         }
 
-        let summaries: Vec<JsonSummary> = self.summaries
+        let summaries: Vec<JsonSummary> = self
+            .summaries
             .iter()
             .map(|s| {
-                let durations: Vec<f64> = s.benchmark_runs
+                let durations: Vec<f64> = s
+                    .benchmark_runs
                     .iter()
                     .filter_map(|r| {
                         if r.is_success() {
@@ -225,10 +231,13 @@ impl Report {
     /// Generate CSV report
     fn generate_csv(&self) -> String {
         let mut output = String::new();
-        output.push_str("command,runs,successful,failed,success_rate,min_ms,max_ms,avg_ms,total_ms\n");
+        output.push_str(
+            "command,runs,successful,failed,success_rate,min_ms,max_ms,avg_ms,total_ms\n",
+        );
 
         for summary in &self.summaries {
-            let durations: Vec<f64> = summary.benchmark_runs
+            let durations: Vec<f64> = summary
+                .benchmark_runs
                 .iter()
                 .filter_map(|r| {
                     if r.is_success() {
@@ -241,7 +250,8 @@ impl Report {
 
             let stats = Statistics::from_sample(&Sample::new(durations));
 
-            output.push_str(&format!("{},{},{},{},{},{},{},{},{}\n",
+            output.push_str(&format!(
+                "{},{},{},{},{},{},{},{},{}\n",
                 escape_csv(&summary.command),
                 summary.benchmark_runs.len(),
                 summary.successful_runs,

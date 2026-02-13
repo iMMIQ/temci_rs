@@ -24,7 +24,7 @@ fn temci_bin() -> PathBuf {
 
 /// Run temci with arguments and return output
 fn run_temci(args: &[&str]) -> Result<std::process::Output, std::io::Error> {
-    Command::new(&temci_bin()).args(args).output()
+    Command::new(temci_bin()).args(args).output()
 }
 
 #[test]
@@ -32,9 +32,11 @@ fn test_readme_short_exec_basic() {
     // README example: temci short-exec 'echo "Hello, World!"'
     let output = run_temci(&["short-exec", "echo \"Hello, World!\""]).unwrap();
 
-    assert!(output.status.success(),
-            "Command failed: {:?}",
-            String::from_utf8_lossy(&output.stderr));
+    assert!(
+        output.status.success(),
+        "Command failed: {:?}",
+        String::from_utf8_lossy(&output.stderr)
+    );
 
     let stdout = String::from_utf8_lossy(&output.stdout);
     // The command is echoed at the start (with escaped characters)
@@ -48,9 +50,11 @@ fn test_readme_short_exec_with_runs() {
     // Using shorter sleep for test speed
     let output = run_temci(&["short-exec", "--runs", "3", "sleep", "0.01"]).unwrap();
 
-    assert!(output.status.success(),
-            "Command failed: {:?}",
-            String::from_utf8_lossy(&output.stderr));
+    assert!(
+        output.status.success(),
+        "Command failed: {:?}",
+        String::from_utf8_lossy(&output.stderr)
+    );
 
     let stdout = String::from_utf8_lossy(&output.stdout);
     assert!(stdout.contains("Runs: 3") || stdout.contains("runs: 3"));
@@ -84,9 +88,11 @@ benchmarks:
     // README example: temci exec (with suite option)
     let output = run_temci(&["exec", "--suite", config_path.to_str().unwrap()]).unwrap();
 
-    assert!(output.status.success(),
-            "Command failed: {:?}",
-            String::from_utf8_lossy(&output.stderr));
+    assert!(
+        output.status.success(),
+        "Command failed: {:?}",
+        String::from_utf8_lossy(&output.stderr)
+    );
 
     let stdout = String::from_utf8_lossy(&output.stdout);
     assert!(stdout.contains("sleep test") || stdout.contains("command test"));
@@ -123,9 +129,11 @@ fn test_readme_report_console() {
     // README example: temci report
     let output = run_temci(&["report", "--input", results_path.to_str().unwrap()]).unwrap();
 
-    assert!(output.status.success(),
-            "Command failed: {:?}",
-            String::from_utf8_lossy(&output.stderr));
+    assert!(
+        output.status.success(),
+        "Command failed: {:?}",
+        String::from_utf8_lossy(&output.stderr)
+    );
 }
 
 #[test]
@@ -264,9 +272,11 @@ fn test_readme_build_with_compiler() {
     let output = run_temci(&["build", "--compiler", "gcc", "--opt-level", "O3"]).unwrap();
 
     // Should succeed (even if stubbed)
-    assert!(output.status.success(),
-            "Command failed: {:?}",
-            String::from_utf8_lossy(&output.stderr));
+    assert!(
+        output.status.success(),
+        "Command failed: {:?}",
+        String::from_utf8_lossy(&output.stderr)
+    );
 }
 
 #[test]
@@ -275,12 +285,7 @@ fn test_readme_setup() {
     let config_path = temp_dir.path().join("temci.yaml");
 
     // README example: temci setup
-    let output = run_temci(&[
-        "setup",
-        "--config",
-        config_path.to_str().unwrap(),
-    ])
-    .unwrap();
+    let output = run_temci(&["setup", "--config", config_path.to_str().unwrap()]).unwrap();
 
     assert!(output.status.success());
     assert!(config_path.exists());

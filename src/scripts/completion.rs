@@ -5,7 +5,7 @@
 
 #![allow(dead_code)]
 
-use anyhow::{Result, anyhow};
+use anyhow::{anyhow, Result};
 use tracing::info;
 
 /// Supported shell types for completion generation
@@ -243,7 +243,8 @@ edit:completion:arg-completer[temci] = [@words] {
         }
     }
 }
-"#.to_string()
+"#
+    .to_string()
 }
 
 /// Generate PowerShell completion script
@@ -325,7 +326,10 @@ mod tests {
         assert_eq!(ShellType::from_str("zsh"), Some(ShellType::Zsh));
         assert_eq!(ShellType::from_str("fish"), Some(ShellType::Fish));
         assert_eq!(ShellType::from_str("elvish"), Some(ShellType::Elvish));
-        assert_eq!(ShellType::from_str("powershell"), Some(ShellType::PowerShell));
+        assert_eq!(
+            ShellType::from_str("powershell"),
+            Some(ShellType::PowerShell)
+        );
         assert_eq!(ShellType::from_str("pwsh"), Some(ShellType::PowerShell));
         assert_eq!(ShellType::from_str("invalid"), None);
     }

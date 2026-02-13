@@ -18,15 +18,11 @@ async fn main() -> anyhow::Result<()> {
         _ => "trace",
     };
 
-    let filter = EnvFilter::try_from_default_env()
-        .unwrap_or_else(|_| EnvFilter::new(filter_level));
+    let filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new(filter_level));
 
-    let subscriber = FmtSubscriber::builder()
-        .with_env_filter(filter)
-        .finish();
+    let subscriber = FmtSubscriber::builder().with_env_filter(filter).finish();
 
-    tracing::subscriber::set_global_default(subscriber)
-        .expect("setting tracing subscriber failed");
+    tracing::subscriber::set_global_default(subscriber).expect("setting tracing subscriber failed");
 
     if let Err(e) = cli.run().await {
         tracing::error!("Error: {}", e);

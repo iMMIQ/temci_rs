@@ -1,0 +1,5 @@
+- attributes:
+    description: test
+  run_config:
+    run_cmd:
+    - test $ARGUMENT

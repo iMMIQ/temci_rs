@@ -1,7 +1,7 @@
 use std::sync::Arc;
 use std::time::Duration;
-use tokio::time::timeout;
 use temci::run::worker_pool::WorkerPool;
+use tokio::time::timeout;
 
 #[tokio::test]
 async fn test_worker_pool_basic() {
@@ -30,9 +30,7 @@ async fn test_worker_pool_concurrent() {
 
     // Spawn a task that tries to acquire
     let pool_clone = Arc::clone(&pool);
-    let handle3_task = tokio::spawn(async move {
-        pool_clone.acquire().await
-    });
+    let handle3_task = tokio::spawn(async move { pool_clone.acquire().await });
 
     // Give it a moment to try to acquire
     tokio::time::sleep(Duration::from_millis(10)).await;
@@ -116,7 +114,8 @@ async fn test_worker_pool_with_timeout() {
     let pool_clone = Arc::clone(&pool);
     let handle2_result = timeout(Duration::from_millis(100), async move {
         pool_clone.acquire().await
-    }).await;
+    })
+    .await;
     assert!(handle2_result.is_err());
 
     // Release first handle
@@ -157,9 +156,7 @@ async fn test_worker_pool_scoped() {
 
     // Spawn a task that tries to acquire
     let pool_clone = Arc::clone(&pool);
-    let handle3_task = tokio::spawn(async move {
-        pool_clone.acquire().await
-    });
+    let handle3_task = tokio::spawn(async move { pool_clone.acquire().await });
 
     // Give it a moment to try to acquire
     tokio::time::sleep(Duration::from_millis(10)).await;

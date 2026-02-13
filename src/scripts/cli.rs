@@ -4,9 +4,9 @@
 
 #![allow(dead_code)]
 
-use clap::{Parser, Subcommand};
+use crate::scripts::{build_cmd, clean, completion, exec, report_cmd as report, setup, short_exec};
 use anyhow::Result as AnyhowResult;
-use crate::scripts::{exec, short_exec, build_cmd, clean, report_cmd as report, setup, completion};
+use clap::{Parser, Subcommand};
 
 /// Advanced benchmarking tool
 #[derive(Parser, Debug)]
@@ -156,24 +156,35 @@ impl TemciCli {
 
         // Dispatch to command handler
         match self.command {
-            Commands::Exec { suite, runs, driver, no_affinity, summary } => {
-                Self::handle_exec(suite, runs, driver, no_affinity, summary).await
-            }
-            Commands::ShortExec { commands, runs, warmup, summary, output, no_save } => {
-                Self::handle_short_exec(commands, runs, warmup, summary, output, no_save).await
-            }
-            Commands::Build { config, force, release, compiler, opt_level } => {
-                Self::handle_build(config, force, release, compiler, opt_level).await
-            }
-            Commands::Clean { all } => {
-                Self::handle_clean(all).await
-            }
-            Commands::Report { format, output, input } => {
-                Self::handle_report(format, output, input).await
-            }
-            Commands::Setup { config, overwrite } => {
-                Self::handle_setup(config, overwrite).await
-            }
+            Commands::Exec {
+                suite,
+                runs,
+                driver,
+                no_affinity,
+                summary,
+            } => Self::handle_exec(suite, runs, driver, no_affinity, summary).await,
+            Commands::ShortExec {
+                commands,
+                runs,
+                warmup,
+                summary,
+                output,
+                no_save,
+            } => Self::handle_short_exec(commands, runs, warmup, summary, output, no_save).await,
+            Commands::Build {
+                config,
+                force,
+                release,
+                compiler,
+                opt_level,
+            } => Self::handle_build(config, force, release, compiler, opt_level).await,
+            Commands::Clean { all } => Self::handle_clean(all).await,
+            Commands::Report {
+                format,
+                output,
+                input,
+            } => Self::handle_report(format, output, input).await,
+            Commands::Setup { config, overwrite } => Self::handle_setup(config, overwrite).await,
             Commands::Completion { shell, _shell } => {
                 Self::handle_completion(shell.or(_shell)).await
             }
@@ -244,11 +255,9 @@ mod tests {
 
     #[test]
     fn test_exec_command() {
-        let cli = TemciCli::try_parse_from([
-            "temci", "exec",
-            "--suite", "my_suite",
-            "--runs", "10",
-        ]).unwrap();
+        let cli =
+            TemciCli::try_parse_from(["temci", "exec", "--suite", "my_suite", "--runs", "10"])
+                .unwrap();
         match cli.command {
             Commands::Exec { suite, runs, .. } => {
                 assert_eq!(suite, Some("my_suite".to_string()));
@@ -261,17 +270,26 @@ mod tests {
     #[test]
     fn test_short_exec_command() {
         let cli = TemciCli::try_parse_from([
-            "temci", "short-exec",
+            "temci",
+            "short-exec",
             "echo hello",
             "echo world",
-            "--runs", "5",
-        ]).unwrap();
+            "--runs",
+            "5",
+        ])
+        .unwrap();
         match cli.command {
-            Commands::ShortExec { commands, runs, output, no_save, .. } => {
+            Commands::ShortExec {
+                commands,
+                runs,
+                output,
+                no_save,
+                ..
+            } => {
                 assert_eq!(commands.len(), 2);
                 assert_eq!(runs, 5);
                 assert_eq!(output, None);
-                assert_eq!(no_save, false);
+                assert!(!no_save);
             }
             _ => panic!("Expected ShortExec command"),
         }
@@ -280,14 +298,19 @@ mod tests {
     #[test]
     fn test_short_exec_with_output() {
         let cli = TemciCli::try_parse_from([
-            "temci", "short-exec",
+            "temci",
+            "short-exec",
             "echo test",
-            "--output", "results.json",
-        ]).unwrap();
+            "--output",
+            "results.json",
+        ])
+        .unwrap();
         match cli.command {
-            Commands::ShortExec { output, no_save, .. } => {
+            Commands::ShortExec {
+                output, no_save, ..
+            } => {
                 assert_eq!(output, Some("results.json".to_string()));
-                assert_eq!(no_save, false);
+                assert!(!no_save);
             }
             _ => panic!("Expected ShortExec command"),
         }
@@ -295,15 +318,14 @@ mod tests {
 
     #[test]
     fn test_short_exec_with_no_save() {
-        let cli = TemciCli::try_parse_from([
-            "temci", "short-exec",
-            "echo test",
-            "--no-save",
-        ]).unwrap();
+        let cli =
+            TemciCli::try_parse_from(["temci", "short-exec", "echo test", "--no-save"]).unwrap();
         match cli.command {
-            Commands::ShortExec { output, no_save, .. } => {
+            Commands::ShortExec {
+                output, no_save, ..
+            } => {
                 assert_eq!(output, None);
-                assert_eq!(no_save, true);
+                assert!(no_save);
             }
             _ => panic!("Expected ShortExec command"),
         }

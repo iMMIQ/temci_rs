@@ -41,18 +41,20 @@ fn create_test_summary(durations_ms: Vec<u64>) -> BenchmarkSummary {
     let runs: Vec<RunResult> = durations_ms
         .iter()
         .enumerate()
-        .map(|(i, &d)| RunResult::new(
-            CommandResult {
-                stdout: String::new(),
-                stderr: String::new(),
-                exit_code: Some(0),
-                duration: Duration::from_millis(d),
-                timeout: false,
-                success: true,
-            },
-            i,
-            false,
-        ))
+        .map(|(i, &d)| {
+            RunResult::new(
+                CommandResult {
+                    stdout: String::new(),
+                    stderr: String::new(),
+                    exit_code: Some(0),
+                    duration: Duration::from_millis(d),
+                    timeout: false,
+                    success: true,
+                },
+                i,
+                false,
+            )
+        })
         .collect();
 
     BenchmarkSummary::new(

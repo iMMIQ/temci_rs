@@ -9,5 +9,8 @@ fn test_parse_run_config() {
 "#;
     let result = RunConfig::from_yaml_str(yaml).unwrap();
     assert_eq!(result.suites.len(), 1);
-    assert_eq!(result.suites[0].attributes.get("description"), Some(&"ls".to_string()));
+    assert_eq!(
+        result.suites[0].attributes.get("description"),
+        Some(&"ls".to_string())
+    );
 }

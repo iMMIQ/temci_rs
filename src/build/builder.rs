@@ -229,22 +229,18 @@ impl Builder {
 
         // Optimization level
         let opt_flag = match compiler {
-            CompilerType::Rustc => {
-                match self.config.opt_level {
-                    OptimizationLevel::None => "-C opt-level=0",
-                    OptimizationLevel::Basic => "-C opt-level=1",
-                    OptimizationLevel::Standard => "-C opt-level=2",
-                    OptimizationLevel::High => "-C opt-level=3",
-                }
-            }
-            _ => {
-                match self.config.opt_level {
-                    OptimizationLevel::None => "-O0",
-                    OptimizationLevel::Basic => "-O1",
-                    OptimizationLevel::Standard => "-O2",
-                    OptimizationLevel::High => "-O3",
-                }
-            }
+            CompilerType::Rustc => match self.config.opt_level {
+                OptimizationLevel::None => "-C opt-level=0",
+                OptimizationLevel::Basic => "-C opt-level=1",
+                OptimizationLevel::Standard => "-C opt-level=2",
+                OptimizationLevel::High => "-C opt-level=3",
+            },
+            _ => match self.config.opt_level {
+                OptimizationLevel::None => "-O0",
+                OptimizationLevel::Basic => "-O1",
+                OptimizationLevel::Standard => "-O2",
+                OptimizationLevel::High => "-O3",
+            },
         };
         cmd.push_str(opt_flag);
         cmd.push(' ');

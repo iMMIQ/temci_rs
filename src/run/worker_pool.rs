@@ -42,11 +42,15 @@ impl WorkerPool {
     /// Try to acquire a permit without blocking.
     /// Returns Some(Permit) if a permit is available, None otherwise.
     pub fn try_acquire(&self) -> Option<Permit> {
-        self.inner.clone().try_acquire_owned().ok().map(|permit| Permit {
-            _permit: Some(permit),
-            acquired: true,
-            has: true,
-        })
+        self.inner
+            .clone()
+            .try_acquire_owned()
+            .ok()
+            .map(|permit| Permit {
+                _permit: Some(permit),
+                acquired: true,
+                has: true,
+            })
     }
 
     /// Get the number of available permits.
@@ -97,7 +101,7 @@ pub struct Permit {
 impl Clone for Permit {
     fn clone(&self) -> Self {
         Self {
-            _permit: None,  // Cloned permits don't hold the semaphore permit
+            _permit: None, // Cloned permits don't hold the semaphore permit
             has: false,
             acquired: false,
         }

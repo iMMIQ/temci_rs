@@ -5,13 +5,13 @@
 
 #![allow(dead_code)]
 
-use std::path::Path;
+use anyhow::{Context, Result};
 use std::fs;
-use anyhow::{Result, Context};
-use tracing::{info, debug};
+use std::path::Path;
+use tracing::{debug, info};
 
-use crate::run::report::{Report, FormatType};
 use crate::run::executor::BenchmarkSummary;
+use crate::run::report::{FormatType, Report};
 use crate::utils::time::{duration_as_ms, duration_to_ms};
 
 /// Saved benchmark results that can be loaded from a file
@@ -75,11 +75,7 @@ impl From<SavedBenchmarkResult> for BenchmarkSummary {
 /// * `format` - Output format (console, csv, json)
 /// * `output` - Optional output file path
 /// * `input` - Optional input data file path (defaults to looking for recent results)
-pub async fn report(
-    format: String,
-    output: Option<String>,
-    input: Option<String>,
-) -> Result<()> {
+pub async fn report(format: String, output: Option<String>, input: Option<String>) -> Result<()> {
     info!("Generating report in {} format", format);
 
     // Parse the format type
@@ -104,7 +100,8 @@ pub async fn report(
     let saved_results = load_results(&input_path)?;
 
     // Convert saved results to BenchmarkSummaries
-    let summaries: Vec<BenchmarkSummary> = saved_results.results
+    let summaries: Vec<BenchmarkSummary> = saved_results
+        .results
         .into_iter()
         .map(|r| r.into())
         .collect();
@@ -147,14 +144,10 @@ fn load_results(path: &str) -> Result<SavedResults> {
         .unwrap_or("");
 
     match ext {
-        "json" => {
-            serde_json::from_str(&content)
-                .with_context(|| format!("Failed to parse JSON from {}", path))
-        }
-        "yaml" | "yml" => {
-            serde_yaml::from_str(&content)
-                .with_context(|| format!("Failed to parse YAML from {}", path))
-        }
+        "json" => serde_json::from_str(&content)
+            .with_context(|| format!("Failed to parse JSON from {}", path)),
+        "yaml" | "yml" => serde_yaml::from_str(&content)
+            .with_context(|| format!("Failed to parse YAML from {}", path)),
         _ => {
             // Try JSON first, then YAML
             serde_json::from_str::<SavedResults>(&content)
@@ -165,11 +158,7 @@ fn load_results(path: &str) -> Result<SavedResults> {
 }
 
 /// Save benchmark results to a file for later reporting
-pub fn save_results(
-    name: &str,
-    summaries: &[BenchmarkSummary],
-    path: &str,
-) -> Result<()> {
+pub fn save_results(name: &str, summaries: &[BenchmarkSummary], path: &str) -> Result<()> {
     let results: Vec<SavedBenchmarkResult> = summaries
         .iter()
         .map(|s| SavedBenchmarkResult {
@@ -197,14 +186,13 @@ pub fn save_results(
         .unwrap_or("json");
 
     let content = match ext {
-        "yaml" | "yml" => serde_yaml::to_string(&saved)
-            .context("Failed to serialize results to YAML")?,
-        _ => serde_json::to_string_pretty(&saved)
-            .context("Failed to serialize results to JSON")?,
+        "yaml" | "yml" => {
+            serde_yaml::to_string(&saved).context("Failed to serialize results to YAML")?
+        }
+        _ => serde_json::to_string_pretty(&saved).context("Failed to serialize results to JSON")?,
     };
 
-    fs::write(path, content)
-        .with_context(|| format!("Failed to write results to {}", path))?;
+    fs::write(path, content).with_context(|| format!("Failed to write results to {}", path))?;
 
     Ok(())
 }
@@ -213,23 +201,38 @@ pub fn save_results(
 mod tests {
     use super::*;
     use std::io::Write;
-    use tempfile::NamedTempFile;
     use std::time::Duration;
+    use tempfile::NamedTempFile;
 
     #[test]
     fn test_format_type_parsing() {
-        assert!(matches!(FormatType::from_str("console"), Some(FormatType::Text)));
+        assert!(matches!(
+            FormatType::from_str("console"),
+            Some(FormatType::Text)
+        ));
         assert!(matches!(FormatType::from_str("csv"), Some(FormatType::Csv)));
-        assert!(matches!(FormatType::from_str("json"), Some(FormatType::Json)));
-        assert!(matches!(FormatType::from_str("text"), Some(FormatType::Text)));
-        assert!(matches!(FormatType::from_str("markdown"), Some(FormatType::Markdown)));
+        assert!(matches!(
+            FormatType::from_str("json"),
+            Some(FormatType::Json)
+        ));
+        assert!(matches!(
+            FormatType::from_str("text"),
+            Some(FormatType::Text)
+        ));
+        assert!(matches!(
+            FormatType::from_str("markdown"),
+            Some(FormatType::Markdown)
+        ));
         assert!(FormatType::from_str("invalid").is_none());
     }
 
     #[test]
     fn test_load_results_json() -> Result<()> {
         let mut temp_file = NamedTempFile::new()?;
-        writeln!(temp_file, r#"{{"name": "test", "timestamp": "2024-01-01T00:00:00Z", "results": []}}"#)?;
+        writeln!(
+            temp_file,
+            r#"{{"name": "test", "timestamp": "2024-01-01T00:00:00Z", "results": []}}"#
+        )?;
 
         let results = load_results(temp_file.path().to_str().unwrap())?;
         assert_eq!(results.name, "test");
@@ -319,7 +322,12 @@ mod tests {
         let mut temp_file = NamedTempFile::new()?;
         writeln!(temp_file, r#"{{"name": "test", "results": []}}"#)?;
 
-        let result = report("console".to_string(), None, Some(temp_file.path().to_str().unwrap().to_string())).await;
+        let result = report(
+            "console".to_string(),
+            None,
+            Some(temp_file.path().to_str().unwrap().to_string()),
+        )
+        .await;
         assert!(result.is_ok());
 
         Ok(())

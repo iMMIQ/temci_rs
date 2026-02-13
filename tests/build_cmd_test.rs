@@ -20,8 +20,11 @@ fn test_build_with_compiler_and_opt_level_flags() {
         .args(["build", "--compiler", "gcc", "--opt-level", "O3"])
         .output()
         .unwrap();
-    assert!(output.status.success(), "build command failed: {:?}",
-            String::from_utf8_lossy(&output.stderr));
+    assert!(
+        output.status.success(),
+        "build command failed: {:?}",
+        String::from_utf8_lossy(&output.stderr)
+    );
 }
 
 #[test]

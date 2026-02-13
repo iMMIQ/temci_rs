@@ -30,16 +30,12 @@ impl Registry {
 
     /// Get a reference to a value of type T by name.
     pub fn get<T: 'static>(&self, name: &str) -> Option<&T> {
-        self.items
-            .get(name)
-            .and_then(|v| v.downcast_ref::<T>())
+        self.items.get(name).and_then(|v| v.downcast_ref::<T>())
     }
 
     /// Get a mutable reference to a value of type T by name.
     pub fn get_mut<T: 'static>(&mut self, name: &str) -> Option<&mut T> {
-        self.items
-            .get_mut(name)
-            .and_then(|v| v.downcast_mut::<T>())
+        self.items.get_mut(name).and_then(|v| v.downcast_mut::<T>())
     }
 
     /// Check if a value with the given name exists.

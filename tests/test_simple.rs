@@ -1,4 +1,4 @@
-use temci::run::worker_pool::{WorkerPool};
+use temci::run::worker_pool::WorkerPool;
 
 #[test]
 fn test_basic() {

@@ -122,9 +122,9 @@ impl CpuSet {
                 cpuset.add_range(start, end + 1);
             } else {
                 // Single CPU
-                let cpu = part.parse().map_err(|_| {
-                    CpuSetError::InvalidSpec(format!("Invalid CPU: {}", part))
-                })?;
+                let cpu = part
+                    .parse()
+                    .map_err(|_| CpuSetError::InvalidSpec(format!("Invalid CPU: {}", part)))?;
                 cpuset.add(cpu);
             }
         }

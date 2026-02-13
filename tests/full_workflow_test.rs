@@ -30,9 +30,7 @@ fn run_temci(args: &[&str]) -> Result<std::process::Output, std::io::Error> {
 
     // If the binary doesn't exist at expected path, try building it first
     if !bin_path.exists() {
-        let _ = Command::new("cargo")
-            .args(["build", "--release"])
-            .status();
+        let _ = Command::new("cargo").args(["build", "--release"]).status();
     }
 
     Command::new(&bin_path).args(args).output()
@@ -236,7 +234,11 @@ fn test_error_handling_graceful() {
     let stderr = String::from_utf8_lossy(&output.stderr);
     let stdout = String::from_utf8_lossy(&output.stdout);
     let output_text = format!("{}{}", stdout, stderr);
-    assert!(output_text.contains("failed") || output_text.contains("Error") || output_text.contains("No such file"));
+    assert!(
+        output_text.contains("failed")
+            || output_text.contains("Error")
+            || output_text.contains("No such file")
+    );
 
     // Test with invalid config - exec should return non-zero
     let temp_dir = TempDir::new().unwrap();
@@ -249,7 +251,13 @@ fn test_error_handling_graceful() {
     let stderr = String::from_utf8_lossy(&output.stderr);
     let stdout = String::from_utf8_lossy(&output.stdout);
     let output_text = format!("{}{}", stdout, stderr);
-    assert!(output_text.contains("failed") || output_text.contains("Error") || output_text.contains("Failed") || output_text.contains("parse") || output_text.contains("config"));
+    assert!(
+        output_text.contains("failed")
+            || output_text.contains("Error")
+            || output_text.contains("Failed")
+            || output_text.contains("parse")
+            || output_text.contains("config")
+    );
 }
 
 #[test]
@@ -297,7 +305,14 @@ fn test_report_format_variants() {
     .unwrap();
 
     // Test console format
-    let output = run_temci(&["report", "--format", "text", "--input", results_path.to_str().unwrap()]).unwrap();
+    let output = run_temci(&[
+        "report",
+        "--format",
+        "text",
+        "--input",
+        results_path.to_str().unwrap(),
+    ])
+    .unwrap();
     assert!(output.status.success());
 
     // Test JSON format

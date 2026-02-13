@@ -5,13 +5,13 @@
 
 #![allow(dead_code)]
 
-use anyhow::{Result, Context};
-use tracing::{info, debug};
+use anyhow::{Context, Result};
+use tracing::{debug, info};
 
-use crate::run::executor::{BenchmarkExecutor, BenchmarkConfig};
+use crate::run::executor::{BenchmarkConfig, BenchmarkExecutor};
 use crate::run::stats::{Sample, Statistics};
-use crate::utils::time::duration_as_ms;
 use crate::scripts::report_cmd::save_results;
+use crate::utils::time::duration_as_ms;
 
 /// Quick execution of commands with simple statistics
 ///
@@ -37,7 +37,10 @@ pub async fn short_exec(
     let actual_runs = if runs == 10 { 20 } else { runs };
     let actual_warmup = if warmup == 0 && runs == 10 { 2 } else { warmup };
 
-    debug!("Configuration: runs={}, warmup={}", actual_runs, actual_warmup);
+    debug!(
+        "Configuration: runs={}, warmup={}",
+        actual_runs, actual_warmup
+    );
 
     // Determine output file path (default: temci_results.json)
     let output_path = if no_save {
@@ -54,7 +57,12 @@ pub async fn short_exec(
 
     // Run each command
     for (idx, cmd_str) in commands.iter().enumerate() {
-        info!("Running command {}/{}: {}", idx + 1, commands.len(), cmd_str);
+        info!(
+            "Running command {}/{}: {}",
+            idx + 1,
+            commands.len(),
+            cmd_str
+        );
 
         // Parse the command string into command and args
         let (command, args) = parse_command_string(cmd_str)?;
@@ -71,7 +79,8 @@ pub async fn short_exec(
         match executor.run_benchmark(&command, &args_refs, &config).await {
             Ok(benchmark_summary) => {
                 // Calculate additional statistics
-                let durations: Vec<f64> = benchmark_summary.benchmark_runs
+                let durations: Vec<f64> = benchmark_summary
+                    .benchmark_runs
                     .iter()
                     .filter_map(|r| {
                         if r.is_success() {
@@ -114,10 +123,8 @@ pub async fn short_exec(
     // Save results to file if not disabled
     if let Some(path) = output_path {
         // Convert CommandBenchmarkResult to BenchmarkSummary for saving
-        let summaries: Vec<crate::run::executor::BenchmarkSummary> = all_results
-            .iter()
-            .map(|r| r.summary.clone())
-            .collect();
+        let summaries: Vec<crate::run::executor::BenchmarkSummary> =
+            all_results.iter().map(|r| r.summary.clone()).collect();
 
         save_results("temci short-exec", &summaries, &path)
             .with_context(|| format!("Failed to save results to {}", path))?;
@@ -125,7 +132,10 @@ pub async fn short_exec(
 
         // Also print a message about using report command
         if !summary {
-            println!("\nResults saved to {}. Use 'temci report' to generate a formatted report.", path);
+            println!(
+                "\nResults saved to {}. Use 'temci report' to generate a formatted report.",
+                path
+            );
         }
     }
 
@@ -198,14 +208,13 @@ fn print_comparison_summary(results: &[CommandBenchmarkResult]) {
     println!("{}", "=".repeat(60));
 
     // Find the fastest command
-    let fastest = results
-        .iter()
-        .filter(|r| r.stats.is_some())
-        .min_by(|a, b| {
-            let a_mean = a.stats.as_ref().unwrap().mean.unwrap_or(f64::MAX);
-            let b_mean = b.stats.as_ref().unwrap().mean.unwrap_or(f64::MAX);
-            a_mean.partial_cmp(&b_mean).unwrap_or(std::cmp::Ordering::Equal)
-        });
+    let fastest = results.iter().filter(|r| r.stats.is_some()).min_by(|a, b| {
+        let a_mean = a.stats.as_ref().unwrap().mean.unwrap_or(f64::MAX);
+        let b_mean = b.stats.as_ref().unwrap().mean.unwrap_or(f64::MAX);
+        a_mean
+            .partial_cmp(&b_mean)
+            .unwrap_or(std::cmp::Ordering::Equal)
+    });
 
     for (idx, result) in results.iter().enumerate() {
         println!("\n{}) {}", idx + 1, result.command);
@@ -269,14 +278,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_short_exec_single_command() -> Result<()> {
-        let result = short_exec(
-            vec!["echo test".to_string()],
-            5,
-            1,
-            true,
-            None,
-            true,
-        ).await;
+        let result = short_exec(vec!["echo test".to_string()], 5, 1, true, None, true).await;
         assert!(result.is_ok());
         Ok(())
     }
@@ -290,7 +292,8 @@ mod tests {
             true,
             None,
             true,
-        ).await;
+        )
+        .await;
         assert!(result.is_ok());
         Ok(())
     }

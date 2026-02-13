@@ -1,5 +1,7 @@
 use std::path::PathBuf;
-use temci::build::builder::{BuildConfig, Builder as BuildBuilder, CompilerType, OptimizationLevel};
+use temci::build::builder::{
+    BuildConfig, Builder as BuildBuilder, CompilerType, OptimizationLevel,
+};
 
 #[test]
 fn test_compiler_type_from_str() {
@@ -46,8 +48,7 @@ fn test_build_config_builder() {
 
 #[test]
 fn test_build_config_with_output_dir() {
-    let config = BuildConfig::new()
-        .with_output_dir("/tmp/build");
+    let config = BuildConfig::new().with_output_dir("/tmp/build");
 
     assert_eq!(config.output_dir, Some(PathBuf::from("/tmp/build")));
 }
@@ -145,10 +146,22 @@ fn test_builder_get_command_with_output_dir() {
 
 #[test]
 fn test_optimization_level_from_str() {
-    assert_eq!(OptimizationLevel::from_str("0"), Some(OptimizationLevel::None));
-    assert_eq!(OptimizationLevel::from_str("1"), Some(OptimizationLevel::Basic));
-    assert_eq!(OptimizationLevel::from_str("2"), Some(OptimizationLevel::Standard));
-    assert_eq!(OptimizationLevel::from_str("3"), Some(OptimizationLevel::High));
+    assert_eq!(
+        OptimizationLevel::from_str("0"),
+        Some(OptimizationLevel::None)
+    );
+    assert_eq!(
+        OptimizationLevel::from_str("1"),
+        Some(OptimizationLevel::Basic)
+    );
+    assert_eq!(
+        OptimizationLevel::from_str("2"),
+        Some(OptimizationLevel::Standard)
+    );
+    assert_eq!(
+        OptimizationLevel::from_str("3"),
+        Some(OptimizationLevel::High)
+    );
     assert_eq!(OptimizationLevel::from_str("4"), None);
 }
 

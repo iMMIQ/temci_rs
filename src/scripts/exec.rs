@@ -8,14 +8,14 @@
 
 #![allow(dead_code)]
 
-use std::path::PathBuf;
+use anyhow::{Context, Result};
 use std::fs::File;
 use std::io::Write;
-use anyhow::{Result, Context};
-use tracing::{info, debug, warn};
+use std::path::PathBuf;
+use tracing::{debug, info, warn};
 
-use crate::run::executor::{BenchmarkExecutor, BenchmarkConfig};
-use crate::run::report::{Report, FormatType};
+use crate::run::executor::{BenchmarkConfig, BenchmarkExecutor};
+use crate::run::report::{FormatType, Report};
 use crate::utils::time::duration_as_ms;
 
 /// Configuration loaded from a YAML file for benchmark execution
@@ -91,7 +91,10 @@ pub async fn exec(
     // Load configuration from file
     let run_config = load_config(&config_path)?;
 
-    debug!("Loaded configuration with {} benchmarks", run_config.benchmarks.len());
+    debug!(
+        "Loaded configuration with {} benchmarks",
+        run_config.benchmarks.len()
+    );
 
     // Check driver availability if specified
     if let Some(driver_name) = &driver {
@@ -113,7 +116,12 @@ pub async fn exec(
     // Run all benchmarks
     let mut all_summaries = Vec::new();
     for (idx, spec) in run_config.benchmarks.iter().enumerate() {
-        info!("Running benchmark {}/{}: {}", idx + 1, run_config.benchmarks.len(), spec.display_name());
+        info!(
+            "Running benchmark {}/{}: {}",
+            idx + 1,
+            run_config.benchmarks.len(),
+            spec.display_name()
+        );
 
         // Apply per-benchmark overrides
         let mut spec_config = benchmark_config.clone();
@@ -127,7 +135,10 @@ pub async fn exec(
         // Convert args to &str for executor
         let args: Vec<&str> = spec.args.iter().map(|s| s.as_str()).collect();
 
-        match executor.run_benchmark(&spec.command, &args, &spec_config).await {
+        match executor
+            .run_benchmark(&spec.command, &args, &spec_config)
+            .await
+        {
             Ok(benchmark_summary) => {
                 all_summaries.push(benchmark_summary.clone());
 
@@ -143,9 +154,7 @@ pub async fn exec(
     }
 
     // Generate and output report
-    let output_format = run_config.output_format
-        .as_deref()
-        .unwrap_or("console");
+    let output_format = run_config.output_format.as_deref().unwrap_or("console");
 
     let format_type = FormatType::from_str(output_format)
         .ok_or_else(|| anyhow::anyhow!("Invalid output format: {}", output_format))?;
@@ -182,11 +191,9 @@ pub async fn exec(
 
 /// Load run configuration from a YAML file
 fn load_config(path: &str) -> Result<RunConfig> {
-    let file = File::open(path)
-        .with_context(|| format!("Failed to open config file: {}", path))?;
+    let file = File::open(path).with_context(|| format!("Failed to open config file: {}", path))?;
 
-    serde_yaml::from_reader(file)
-        .with_context(|| format!("Failed to parse config file: {}", path))
+    serde_yaml::from_reader(file).with_context(|| format!("Failed to parse config file: {}", path))
 }
 
 /// Validate that the specified driver is available
@@ -220,7 +227,10 @@ fn setup_cpu_affinity() -> Result<()> {
 }
 
 /// Build a BenchmarkConfig from the loaded RunConfig
-fn build_benchmark_config(config: &RunConfig, runs_override: Option<usize>) -> Result<BenchmarkConfig> {
+fn build_benchmark_config(
+    config: &RunConfig,
+    runs_override: Option<usize>,
+) -> Result<BenchmarkConfig> {
     let runs = runs_override.or(config.runs).unwrap_or(10);
     let warmup_runs = config.warmup_runs.unwrap_or(3);
 
@@ -252,7 +262,6 @@ fn build_benchmark_config(config: &RunConfig, runs_override: Option<usize>) -> R
 
 /// Print a quick summary for a single benchmark
 fn print_quick_summary(name: &str, summary: &crate::run::executor::BenchmarkSummary) {
-
     println!("\n{}", name);
     println!("{}", "=".repeat(60));
     println!("  Runs: {}", summary.benchmark_runs.len());
@@ -289,8 +298,8 @@ fn print_summary_report(report: &Report) {
 
 /// Save report content to a file
 fn save_report(path: &str, content: &str) -> Result<()> {
-    let mut file = File::create(path)
-        .with_context(|| format!("Failed to create output file: {}", path))?;
+    let mut file =
+        File::create(path).with_context(|| format!("Failed to create output file: {}", path))?;
 
     file.write_all(content.as_bytes())
         .with_context(|| format!("Failed to write to output file: {}", path))?;

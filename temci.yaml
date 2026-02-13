@@ -1,0 +1,31 @@
+# temci configuration file
+# This file contains default benchmarking settings
+
+# Number of runs for each benchmark
+runs: 10
+
+# Number of warmup runs before measuring
+warmup_runs: 3
+
+# Run driver to use: basic, perf_stat, perf_record, valgrind
+driver: basic
+
+# Disable CPU affinity (set to true for more variable results)
+no_affinity: false
+
+# Output format: console, csv, json, markdown
+output_format: console
+
+# Save results to file (optional)
+# output_file: temci_results.json
+
+# Benchmark suite
+benchmarks:
+  # Example benchmarks
+  - command: echo
+    args: ["hello"]
+    name: "Example echo benchmark"
+
+  - command: sleep
+    args: ["0.001"]
+    name: "Example sleep benchmark"

@@ -5,15 +5,15 @@
 
 #![allow(dead_code)]
 
+use async_trait::async_trait;
 use std::collections::HashMap;
 use std::process::{Command, Stdio};
 use std::time::{Duration, Instant};
 use tokio::process::Command as TokioCommand;
 use tokio::time::timeout as tokio_timeout;
-use async_trait::async_trait;
 use tracing::{debug, trace};
 
-use crate::utils::error::{TemciError, Result};
+use crate::utils::error::{Result, TemciError};
 
 /// Result of a command execution
 #[derive(Debug, Clone)]
@@ -250,11 +250,11 @@ impl Runner for CommandRunner {
             .spawn()
             .map_err(|e| TemciError::ExecutionError(format!("Async execution failed: {}", e)))?;
 
-        // Take ownership of stdout and stderr before waiting
-        let mut stdout_reader = child.stdout.take().expect("stdout not captured");
-        let mut stderr_reader = child.stderr.take().expect("stderr not captured");
-
         let (stdout_bytes, stderr_bytes, exit_code, success) = if let Some(dur) = &self.timeout {
+            // Take ownership of stdout and stderr for timeout case (need to read manually)
+            let mut stdout_reader = child.stdout.take().expect("stdout not captured");
+            let mut stderr_reader = child.stderr.take().expect("stderr not captured");
+
             // Wait with timeout - if timeout occurs, we still have child to kill
             match tokio_timeout(*dur, child.wait()).await {
                 Ok(Ok(status)) => {
@@ -271,7 +271,10 @@ impl Runner for CommandRunner {
                     (stdout_buf, stderr_buf, exit_code, success)
                 }
                 Ok(Err(e)) => {
-                    return Err(TemciError::ExecutionError(format!("Async execution failed: {}", e)));
+                    return Err(TemciError::ExecutionError(format!(
+                        "Async execution failed: {}",
+                        e
+                    )));
                 }
                 Err(_) => {
                     // Timeout occurred - kill the child process
@@ -288,10 +291,10 @@ impl Runner for CommandRunner {
                 }
             }
         } else {
-            // No timeout - use wait_with_output which takes ownership
-            let output = child.wait_with_output()
-                .await
-                .map_err(|e| TemciError::ExecutionError(format!("Async execution failed: {}", e)))?;
+            // No timeout - use wait_with_output which handles reading stdout/stderr for us
+            let output = child.wait_with_output().await.map_err(|e| {
+                TemciError::ExecutionError(format!("Async execution failed: {}", e))
+            })?;
 
             let exit_code = output.status.code();
             let success = output.status.success();
@@ -360,7 +363,7 @@ impl PerfRunner {
         let mut cmd = Vec::with_capacity(7 + args.len());
         cmd.push("perf".to_string());
         cmd.push("stat".to_string());
-        cmd.push("-x,".to_string());  // CSV output
+        cmd.push("-x,".to_string()); // CSV output
         cmd.push("-e".to_string());
         cmd.push(self.events.join(","));
         cmd.push("--".to_string());

@@ -182,4 +182,3 @@ fn test_sample_extend() {
     sample.extend(vec![3.0, 4.0]);
     assert_eq!(sample.len(), 4);
 }
-

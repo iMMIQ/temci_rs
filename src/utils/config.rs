@@ -112,11 +112,10 @@ impl Default for Settings {
 impl Settings {
     pub fn load<P: AsRef<Path>>(path: P) -> Result<Self> {
         let content = std::fs::read_to_string(path)?;
-        let mut settings: Self = serde_yaml::from_str(&content)
-            .unwrap_or_else(|e| {
-                tracing::warn!("Failed to parse settings file, using defaults: {}", e);
-                Self::default()
-            });
+        let mut settings: Self = serde_yaml::from_str(&content).unwrap_or_else(|e| {
+            tracing::warn!("Failed to parse settings file, using defaults: {}", e);
+            Self::default()
+        });
 
         if settings.run.is_none() {
             settings.run = Self::default().run;

@@ -13,7 +13,13 @@ pub async fn build(
     _compiler: Option<String>,
     _opt_level: Option<String>,
 ) -> Result<()> {
-    tracing::info!("Build: config={:?} force={} release={} compiler={:?} opt_level={:?}",
-                   _config, _force, _release, _compiler, _opt_level);
+    tracing::info!(
+        "Build: config={:?} force={} release={} compiler={:?} opt_level={:?}",
+        _config,
+        _force,
+        _release,
+        _compiler,
+        _opt_level
+    );
     Ok(())
 }

@@ -5,10 +5,10 @@
 
 #![allow(dead_code)]
 
+use anyhow::{Context, Result};
 use std::fs;
 use std::path::Path;
-use anyhow::{Result, Context};
-use tracing::{info, debug};
+use tracing::{debug, info};
 
 use crate::build::builder::CompilerType;
 
@@ -59,8 +59,7 @@ fn create_temci_directory() -> Result<()> {
     let temci_dir = Path::new(TEMCI_DIR_NAME);
 
     if !temci_dir.exists() {
-        fs::create_dir(temci_dir)
-            .context("Failed to create .temci directory")?;
+        fs::create_dir(temci_dir).context("Failed to create .temci directory")?;
         info!("Created .temci directory");
     } else {
         debug!(".temci directory already exists");
@@ -179,8 +178,7 @@ fn create_config_file(config_path: &str, _overwrite: bool) -> Result<()> {
     let config_content = generate_default_config()?;
 
     // Write config file
-    fs::write(config_path, config_content)
-        .context("Failed to write config file")?;
+    fs::write(config_path, config_content).context("Failed to write config file")?;
 
     Ok(())
 }
@@ -236,13 +234,48 @@ fn print_setup_summary(config_path: &str) {
     if let Ok(sys_info) = check_system_requirements() {
         println!("\nSystem Information:");
         println!("  CPUs: {}", sys_info.cpus);
-        println!("  perf: {}", if sys_info.has_perf { "available" } else { "not available" });
-        println!("  valgrind: {}", if sys_info.has_valgrind { "available" } else { "not available" });
+        println!(
+            "  perf: {}",
+            if sys_info.has_perf {
+                "available"
+            } else {
+                "not available"
+            }
+        );
+        println!(
+            "  valgrind: {}",
+            if sys_info.has_valgrind {
+                "available"
+            } else {
+                "not available"
+            }
+        );
 
         println!("\nCompilers:");
-        println!("  gcc: {}", if sys_info.has_gcc { "available" } else { "not available" });
-        println!("  clang: {}", if sys_info.has_clang { "available" } else { "not available" });
-        println!("  rustc: {}", if sys_info.has_rustc { "available" } else { "not available" });
+        println!(
+            "  gcc: {}",
+            if sys_info.has_gcc {
+                "available"
+            } else {
+                "not available"
+            }
+        );
+        println!(
+            "  clang: {}",
+            if sys_info.has_clang {
+                "available"
+            } else {
+                "not available"
+            }
+        );
+        println!(
+            "  rustc: {}",
+            if sys_info.has_rustc {
+                "available"
+            } else {
+                "not available"
+            }
+        );
 
         if let Some(compiler) = sys_info.recommended_compiler() {
             println!("  Recommended: {}", compiler);

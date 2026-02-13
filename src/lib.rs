@@ -4,4 +4,4 @@ pub mod run;
 pub mod scripts;
 pub mod utils;
 
-pub use utils::error::{TemciError, Result};
+pub use utils::error::{Result, TemciError};

@@ -102,7 +102,8 @@ async fn test_command_runner_multiple_async() {
     let result1 = runner.run("echo", &["first"]);
     let result2 = runner.run("echo", &["second"]);
 
-    let (r1, r2): (std::result::Result<_, _>, std::result::Result<_, _>) = tokio::join!(result1, result2);
+    let (r1, r2): (std::result::Result<_, _>, std::result::Result<_, _>) =
+        tokio::join!(result1, result2);
 
     assert!(r1.is_ok());
     assert!(r2.is_ok());

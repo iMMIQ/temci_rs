@@ -8,4 +8,3 @@ pub mod report;
 pub mod runner;
 pub mod stats;
 pub mod worker_pool;
-

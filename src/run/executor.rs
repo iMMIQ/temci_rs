@@ -78,7 +78,11 @@ pub struct RunResult {
 }
 
 impl RunResult {
-    pub fn new(result: crate::run::runner::CommandResult, run_number: usize, is_warmup: bool) -> Self {
+    pub fn new(
+        result: crate::run::runner::CommandResult,
+        run_number: usize,
+        is_warmup: bool,
+    ) -> Self {
         Self {
             result,
             run_number,
@@ -122,7 +126,13 @@ impl BenchmarkSummary {
 
         let durations: Vec<Duration> = benchmark_runs
             .iter()
-            .filter_map(|r| if r.is_success() { Some(r.duration()) } else { None })
+            .filter_map(|r| {
+                if r.is_success() {
+                    Some(r.duration())
+                } else {
+                    None
+                }
+            })
             .collect();
 
         let min_duration = durations.iter().copied().min();
@@ -134,10 +144,7 @@ impl BenchmarkSummary {
             None
         };
 
-        let total_time = all_runs
-            .iter()
-            .map(|r| r.result.duration)
-            .sum::<Duration>();
+        let total_time = all_runs.iter().map(|r| r.result.duration).sum::<Duration>();
 
         Self {
             all_runs,
@@ -169,9 +176,7 @@ pub struct BenchmarkExecutor {
 impl BenchmarkExecutor {
     pub fn new(_max_concurrent: usize) -> Self {
         let runner = CommandRunner::new();
-        Self {
-            runner,
-        }
+        Self { runner }
     }
 
     pub fn default_executor() -> Self {
@@ -179,10 +184,16 @@ impl BenchmarkExecutor {
     }
 
     /// Helper method to run a command using the runner
-    async fn run_command(&mut self, command: &str, args: &[&str]) -> anyhow::Result<crate::run::runner::CommandResult> {
+    async fn run_command(
+        &mut self,
+        command: &str,
+        args: &[&str],
+    ) -> anyhow::Result<crate::run::runner::CommandResult> {
         use crate::run::runner::Runner;
 
-        self.runner.run(command, args).await
+        self.runner
+            .run(command, args)
+            .await
             .map_err(|e| anyhow::anyhow!("Command execution failed: {}", e))
     }
 

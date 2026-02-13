@@ -26,7 +26,10 @@ async fn test_benchmark_config_builder() {
     assert_eq!(config.warmup_runs, 2);
     assert_eq!(config.timeout, Some(Duration::from_secs(30)));
     assert_eq!(config.working_dir, Some("/tmp".to_string()));
-    assert_eq!(config.env_vars, vec![("KEY".to_string(), "value".to_string())]);
+    assert_eq!(
+        config.env_vars,
+        vec![("KEY".to_string(), "value".to_string())]
+    );
     assert_eq!(config.max_concurrent, 4);
 }
 
@@ -39,8 +42,8 @@ async fn test_benchmark_executor_creation() {
 
 #[tokio::test]
 async fn test_run_result_creation() {
-    use temci::run::runner::CommandResult;
     use std::time::Duration;
+    use temci::run::runner::CommandResult;
 
     let cmd_result = CommandResult {
         stdout: "output".to_string(),
@@ -60,8 +63,8 @@ async fn test_run_result_creation() {
 
 #[tokio::test]
 async fn test_run_result_warmup() {
-    use temci::run::runner::CommandResult;
     use std::time::Duration;
+    use temci::run::runner::CommandResult;
 
     let cmd_result = CommandResult {
         stdout: String::new(),
@@ -79,8 +82,8 @@ async fn test_run_result_warmup() {
 
 #[tokio::test]
 async fn test_benchmark_summary_success_rate() {
-    use temci::run::runner::CommandResult;
     use std::time::Duration;
+    use temci::run::runner::CommandResult;
 
     let success_run = RunResult::new(
         CommandResult {
@@ -122,8 +125,8 @@ async fn test_benchmark_summary_success_rate() {
 
 #[tokio::test]
 async fn test_benchmark_summary_duration_stats() {
-    use temci::run::runner::CommandResult;
     use std::time::Duration;
+    use temci::run::runner::CommandResult;
 
     let run1 = RunResult::new(
         CommandResult {
@@ -179,12 +182,8 @@ async fn test_benchmark_summary_duration_stats() {
 
 #[tokio::test]
 async fn test_benchmark_summary_empty() {
-    let summary = temci::run::executor::BenchmarkSummary::new(
-        "test".to_string(),
-        vec![],
-        vec![],
-        vec![],
-    );
+    let summary =
+        temci::run::executor::BenchmarkSummary::new("test".to_string(), vec![], vec![], vec![]);
 
     assert_eq!(summary.successful_runs, 0);
     assert_eq!(summary.failed_runs, 0);
@@ -196,8 +195,8 @@ async fn test_benchmark_summary_empty() {
 
 #[tokio::test]
 async fn test_benchmark_summary_total_time_includes_warmup() {
-    use temci::run::runner::CommandResult;
     use std::time::Duration;
+    use temci::run::runner::CommandResult;
 
     let warmup = RunResult::new(
         CommandResult {
@@ -242,11 +241,12 @@ async fn test_benchmark_summary_total_time_includes_warmup() {
 #[tokio::test]
 async fn test_benchmark_executor_run_simple_command() {
     let mut executor = BenchmarkExecutor::default_executor();
-    let config = BenchmarkConfig::new()
-        .with_runs(2)
-        .with_warmup(1);
+    let config = BenchmarkConfig::new().with_runs(2).with_warmup(1);
 
-    let summary = executor.run_benchmark("echo", &["hello"], &config).await.unwrap();
+    let summary = executor
+        .run_benchmark("echo", &["hello"], &config)
+        .await
+        .unwrap();
 
     assert_eq!(summary.command, "echo");
     assert_eq!(summary.args, vec!["hello"]);
@@ -260,9 +260,7 @@ async fn test_benchmark_executor_run_simple_command() {
 #[tokio::test]
 async fn test_benchmark_executor_with_warmup() {
     let mut executor = BenchmarkExecutor::default_executor();
-    let config = BenchmarkConfig::new()
-        .with_runs(1)
-        .with_warmup(2);
+    let config = BenchmarkConfig::new().with_runs(1).with_warmup(2);
 
     let summary = executor.run_benchmark("true", &[], &config).await.unwrap();
 

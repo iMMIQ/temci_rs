@@ -31,5 +31,9 @@ fn bench_outlier_detection(c: &mut Criterion) {
     group.finish();
 }
 
-criterion_group!(benches, bench_statistics_from_sample, bench_outlier_detection);
+criterion_group!(
+    benches,
+    bench_statistics_from_sample,
+    bench_outlier_detection
+);
 criterion_main!(benches);

@@ -11,7 +11,7 @@ fn main() {
     println!("  p90: {}", d1.quantile(0.90));
     println!("  p95: {}", d1.quantile(0.95));
     println!("  p99: {}", d1.quantile(0.99));
-    
+
     // Test data 2: [1.0, 2.0, 3.0]
     let data2 = vec![1.0, 2.0, 3.0];
     let mut d2 = Data::new(data2);
