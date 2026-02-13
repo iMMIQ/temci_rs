@@ -6,6 +6,8 @@
 //! - Generating reports in console or CSV format
 //! - Saving results to files
 
+#![allow(dead_code)]
+
 use std::path::PathBuf;
 use std::fs::File;
 use std::io::Write;
@@ -249,7 +251,6 @@ fn build_benchmark_config(config: &RunConfig, runs_override: Option<usize>) -> R
 
 /// Print a quick summary for a single benchmark
 fn print_quick_summary(name: &str, summary: &crate::run::executor::BenchmarkSummary) {
-    use std::time::Duration;
 
     println!("\n{}", name);
     println!("{}", "=".repeat(60));

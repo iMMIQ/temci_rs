@@ -3,6 +3,8 @@
 //! This module provides functionality to generate reports from saved benchmark results,
 //! supporting various output formats including console, CSV, and JSON.
 
+#![allow(dead_code)]
+
 use std::path::Path;
 use std::fs;
 use anyhow::{Result, Context};

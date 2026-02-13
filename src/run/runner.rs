@@ -3,6 +3,8 @@
 //! Provides functionality to execute commands as subprocesses and capture their output.
 //! Supports basic execution and performance measurement with perf.
 
+#![allow(dead_code)]
+
 use std::collections::HashMap;
 use std::process::{Command, Stdio};
 use std::time::{Duration, Instant};
@@ -76,6 +78,7 @@ pub enum RunDriver {
 
 impl RunDriver {
     /// Parse a string into a RunDriver
+    #[allow(clippy::should_implement_trait)]
     pub fn from_str(s: &str) -> Option<Self> {
         match s.to_lowercase().as_str() {
             "basic" => Some(RunDriver::Basic),

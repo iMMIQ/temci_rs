@@ -3,6 +3,8 @@
 //! Provides formatters for generating reports in various formats
 //! including text, markdown, JSON, and CSV.
 
+#![allow(dead_code)]
+
 use crate::run::executor::BenchmarkSummary;
 use crate::run::stats::{Sample, Statistics};
 use serde::Serialize;
@@ -22,6 +24,7 @@ pub enum FormatType {
 
 impl FormatType {
     /// Parse a string into a FormatType
+    #[allow(clippy::should_implement_trait)]
     pub fn from_str(s: &str) -> Option<Self> {
         match s.to_lowercase().as_str() {
             "text" | "console" => Some(FormatType::Text),

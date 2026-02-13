@@ -3,6 +3,8 @@
 //! This module provides functionality to generate shell completion scripts
 //! for bash, zsh, fish, elvish, and PowerShell.
 
+#![allow(dead_code)]
+
 use anyhow::{Result, anyhow};
 use tracing::info;
 
@@ -23,6 +25,7 @@ pub enum ShellType {
 
 impl ShellType {
     /// Parse a string into a ShellType
+    #[allow(clippy::should_implement_trait)]
     pub fn from_str(s: &str) -> Option<Self> {
         match s.to_lowercase().as_str() {
             "bash" => Some(ShellType::Bash),
@@ -72,7 +75,7 @@ impl ShellType {
 /// # Arguments
 ///
 /// * `shell` - Optional shell type (bash, zsh, fish, elvish, powershell)
-///               If None, attempts to detect from environment
+///   If None, attempts to detect from environment
 pub async fn completion(shell: Option<String>) -> Result<()> {
     // Determine shell type
     let shell_type = if let Some(shell_name) = shell {

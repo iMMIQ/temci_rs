@@ -3,6 +3,8 @@
 //! Provides functionality for managing CPU assignments and
 //! setting CPU affinity for processes.
 
+#![allow(dead_code)]
+
 use std::collections::BTreeSet;
 use std::fmt;
 
@@ -188,6 +190,7 @@ impl CpuSet {
     }
 
     /// Create an iterator that collects into a CpuSet
+    #[allow(clippy::should_implement_trait)]
     pub fn from_iter<I: IntoIterator<Item = usize>>(iter: I) -> Self {
         let mut cpuset = Self::empty();
         for cpu in iter {

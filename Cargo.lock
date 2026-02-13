@@ -1196,6 +1196,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "stats-ci"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2a98c29e345c3bbd19152decb20856ee8b6407084c4735800f277401350cee33"
+dependencies = [
+ "approx",
+ "lazy_static",
+ "num-traits",
+ "statrs",
+ "thiserror",
+]
+
+[[package]]
 name = "strsim"
 version = "0.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1259,6 +1272,7 @@ dependencies = [
  "serde_yaml",
  "shell-words",
  "statrs",
+ "stats-ci",
  "sysinfo",
  "tempfile",
  "termcolor",

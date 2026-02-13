@@ -3,6 +3,8 @@
 //! Provides functionality to build benchmark programs with various
 //! compilers and build options.
 
+#![allow(dead_code)]
+
 use std::path::PathBuf;
 
 /// Types of compilers supported
@@ -18,6 +20,7 @@ pub enum CompilerType {
 
 impl CompilerType {
     /// Parse a string into a CompilerType
+    #[allow(clippy::should_implement_trait)]
     pub fn from_str(s: &str) -> Option<Self> {
         match s.to_lowercase().as_str() {
             "gcc" => Some(CompilerType::Gcc),
@@ -62,6 +65,7 @@ pub enum OptimizationLevel {
 
 impl OptimizationLevel {
     /// Parse a string into an OptimizationLevel
+    #[allow(clippy::should_implement_trait)]
     pub fn from_str(s: &str) -> Option<Self> {
         match s {
             "0" => Some(OptimizationLevel::None),

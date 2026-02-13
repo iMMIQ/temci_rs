@@ -2,6 +2,8 @@
 //!
 //! Placeholder for build functionality.
 
+#![allow(dead_code)]
+
 use anyhow::Result;
 
 pub async fn build(

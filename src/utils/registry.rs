@@ -3,6 +3,9 @@
 //! Provides a generic registry for storing and retrieving items by name.
 //! Includes both a type-erased Registry and a TypedRegistry for type-safe access.
 
+// Registry is a public API component
+#![allow(dead_code)]
+
 use std::any::Any;
 use std::collections::HashMap;
 

@@ -2,6 +2,8 @@
 //!
 //! Provides the main CLI parser and command dispatching.
 
+#![allow(dead_code)]
+
 use clap::{Parser, Subcommand};
 use anyhow::Result as AnyhowResult;
 use crate::scripts::{exec, short_exec, build_cmd, clean, report_cmd as report, setup, completion};
@@ -177,6 +179,7 @@ impl TemciCli {
         short_exec::short_exec(commands, runs, warmup, summary).await
     }
 
+    #[allow(dead_code)]
     async fn handle_build(
         config: Option<String>,
         force: bool,

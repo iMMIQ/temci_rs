@@ -3,6 +3,8 @@
 //! Provides a executor for running benchmarks with multiple executions
 //! and collecting statistics.
 
+#![allow(dead_code)]
+
 use std::time::Duration;
 
 use crate::run::runner::CommandRunner;
@@ -162,15 +164,13 @@ impl BenchmarkSummary {
 /// Benchmark executor for running benchmarks
 pub struct BenchmarkExecutor {
     runner: CommandRunner,
-    max_concurrent: usize,
 }
 
 impl BenchmarkExecutor {
-    pub fn new(max_concurrent: usize) -> Self {
+    pub fn new(_max_concurrent: usize) -> Self {
         let runner = CommandRunner::new();
         Self {
             runner,
-            max_concurrent,
         }
     }
 

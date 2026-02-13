@@ -1,3 +1,6 @@
+// Configuration structures - public API
+#![allow(dead_code)]
+
 use crate::utils::{Result, TemciError};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;

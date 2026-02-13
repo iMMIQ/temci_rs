@@ -3,6 +3,8 @@
 //! This module provides a quick way to benchmark commands without creating
 //! a configuration file. It's useful for ad-hoc benchmarking.
 
+#![allow(dead_code)]
+
 use anyhow::{Result, Context};
 use tracing::{info, debug};
 
@@ -158,6 +160,7 @@ fn print_detailed_result(result: &CommandBenchmarkResult) {
 }
 
 /// Print a comparison summary for all commands
+#[allow(dead_code)]
 fn print_comparison_summary(results: &[CommandBenchmarkResult]) {
     println!("\n{}", "=".repeat(60));
     println!("SUMMARY");
@@ -181,7 +184,7 @@ fn print_comparison_summary(results: &[CommandBenchmarkResult]) {
             print!("  Mean: {:.2} ms", mean);
 
             // Show relative speed compared to fastest
-            if let Some(ref fastest_result) = fastest {
+            if let Some(fastest_result) = fastest {
                 if result.command != fastest_result.command {
                     let fastest_mean = fastest_result.stats.as_ref().unwrap().mean.unwrap_or(1.0);
                     if fastest_mean > 0.0 {

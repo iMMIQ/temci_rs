@@ -3,6 +3,8 @@
 //! This module provides functionality to set up temci for first-time use,
 //! including checking for required tools and creating configuration files.
 
+#![allow(dead_code)]
+
 use std::fs;
 use std::path::Path;
 use anyhow::{Result, Context};
@@ -10,6 +12,7 @@ use tracing::{info, debug};
 
 use crate::build::builder::CompilerType;
 
+#[allow(dead_code)]
 /// Default configuration file name
 const DEFAULT_CONFIG_NAME: &str = "temci.yaml";
 
@@ -56,7 +59,7 @@ fn create_temci_directory() -> Result<()> {
     let temci_dir = Path::new(TEMCI_DIR_NAME);
 
     if !temci_dir.exists() {
-        fs::create_dir(&temci_dir)
+        fs::create_dir(temci_dir)
             .context("Failed to create .temci directory")?;
         info!("Created .temci directory");
     } else {
@@ -170,19 +173,14 @@ impl SystemInfo {
 }
 
 /// Create a default configuration file
-fn create_config_file(config_path: &str, overwrite: bool) -> Result<()> {
+fn create_config_file(config_path: &str, _overwrite: bool) -> Result<()> {
     info!("Creating configuration file: {}", config_path);
 
     let config_content = generate_default_config()?;
 
     // Write config file
-    if overwrite {
-        fs::write(config_path, config_content)
-            .context("Failed to write config file")?;
-    } else {
-        fs::write(config_path, config_content)
-            .context("Failed to write config file")?;
-    }
+    fs::write(config_path, config_content)
+        .context("Failed to write config file")?;
 
     Ok(())
 }

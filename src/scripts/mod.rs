@@ -7,4 +7,6 @@ pub mod report_cmd;
 pub mod setup;
 pub mod short_exec;
 
+// Re-exports for public API
+#[allow(unused_imports)]
 pub use cli::TemciCli;

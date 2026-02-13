@@ -3,6 +3,8 @@
 //! This module provides functionality to clean up temporary directories
 //! and build artifacts created by temci.
 
+#![allow(dead_code)]
+
 use std::fs;
 use std::path::{Path, PathBuf};
 use anyhow::{Result, Context};
@@ -139,10 +141,8 @@ fn clean_cpu_affinity_files() -> Result<Vec<String>> {
                     if fs::remove_file(&path).is_ok() {
                         cleaned.push(path.display().to_string());
                     }
-                } else if path.is_dir() {
-                    if fs::remove_dir_all(&path).is_ok() {
-                        cleaned.push(path.display().to_string());
-                    }
+                } else if path.is_dir() && fs::remove_dir_all(&path).is_ok() {
+                    cleaned.push(path.display().to_string());
                 }
             }
         }
@@ -188,17 +188,13 @@ fn clean_all_artifacts() -> Result<Vec<String>> {
 
         // Only clean temci-specific build artifacts to be safe
         let temci_build_dir = target_dir.join("debug").join("build");
-        if temci_build_dir.exists() {
-            if fs::remove_dir_all(&temci_build_dir).is_ok() {
-                cleaned.push(temci_build_dir.display().to_string());
-            }
+        if temci_build_dir.exists() && fs::remove_dir_all(&temci_build_dir).is_ok() {
+            cleaned.push(temci_build_dir.display().to_string());
         }
 
         let temci_incremental = target_dir.join("debug").join("incremental");
-        if temci_incremental.exists() {
-            if fs::remove_dir_all(&temci_incremental).is_ok() {
-                cleaned.push(temci_incremental.display().to_string());
-            }
+        if temci_incremental.exists() && fs::remove_dir_all(&temci_incremental).is_ok() {
+            cleaned.push(temci_incremental.display().to_string());
         }
     }
 
@@ -214,6 +210,7 @@ fn clean_all_artifacts() -> Result<Vec<String>> {
     Ok(cleaned)
 }
 
+#[allow(dead_code)]
 /// Check if a directory exists and can be cleaned
 fn is_cleanable_dir(path: &Path) -> bool {
     path.exists() && (path.is_dir() || path.is_file())
