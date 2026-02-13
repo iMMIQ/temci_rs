@@ -221,8 +221,12 @@ temci setup [OPTIONS]
 ### `completion`
 生成 Shell 自動補完腳本。
 ```bash
-temci completion <SHELL>
+temci completion <SHELL>          # 位置參數
+temci completion -s <SHELL>        # 使用 -s 選項
+temci completion --shell <SHELL>  # 使用 --shell 選項
 ```
+
+支援嘅 Shell：`bash`、`zsh`、`fish`、`elvish`、`powershell`
 
 ## 設定檔格式
 

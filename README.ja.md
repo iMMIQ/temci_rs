@@ -221,8 +221,12 @@ temci setup [OPTIONS]
 ### `completion`
 シェル補完スクリプトを生成。
 ```bash
-temci completion <SHELL>
+temci completion <SHELL>          # 位置引数
+temci completion -s <SHELL>        # -s オプション使用
+temci completion --shell <SHELL>  # --shell オプション使用
 ```
+
+対応シェル：`bash`、`zsh`、`fish`、`elvish`、`powershell`
 
 ## 設定ファイル形式
 

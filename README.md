@@ -221,8 +221,12 @@ temci setup [OPTIONS]
 ### `completion`
 Generate shell completion scripts.
 ```bash
-temci completion <SHELL>
+temci completion <SHELL>          # Positional argument
+temci completion -s <SHELL>        # Using -s option
+temci completion --shell <SHELL>  # Using --shell option
 ```
+
+Supported shells: `bash`, `zsh`, `fish`, `elvish`, `powershell`
 
 ## Configuration File Format
 

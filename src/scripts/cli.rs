@@ -131,9 +131,13 @@ pub enum Commands {
 
     /// Generate shell completion
     Completion {
-        /// Shell type (bash, zsh, fish, elvish)
-        #[arg(short = 's', long)]
+        /// Shell type (bash, zsh, fish, elvish, powershell)
+        #[arg(short = 's', long, value_name = "SHELL")]
         shell: Option<String>,
+
+        /// Shell type (positional argument for convenience)
+        #[arg(value_name = "SHELL", conflicts_with = "shell")]
+        _shell: Option<String>,
     },
 }
 
@@ -162,8 +166,8 @@ impl TemciCli {
             Commands::Setup { config, overwrite } => {
                 Self::handle_setup(config, overwrite).await
             }
-            Commands::Completion { shell } => {
-                Self::handle_completion(shell).await
+            Commands::Completion { shell, _shell } => {
+                Self::handle_completion(shell.or(_shell)).await
             }
         }
     }
