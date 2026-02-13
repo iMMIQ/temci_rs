@@ -85,6 +85,8 @@ temci short-exec 'echo "Hello, World!"'
 temci short-exec --runs 20 'sleep 1'
 ```
 
+**注意**: `short-exec` は自動的に結果を `temci_results.json` に保存し、後で `report` コマンドで使用できるようにします。この動作を無効にするには `--no-save` オプションを使用してください。
+
 ### ベンチマーク設定
 
 YAML設定ファイル（`temci.yaml`）を作成します：
@@ -115,7 +117,7 @@ temci exec
 保存された結果からレポートを生成します：
 
 ```bash
-# コンソール出力（デフォルト）
+# コンソール出力（デフォルト）- temci_results.json から読み込み
 temci report
 
 # ファイルに保存
@@ -125,6 +127,9 @@ temci report --output results.txt
 temci report --format json --output results.json
 temci report --format csv --output results.csv
 temci report --format markdown --output results.md
+
+# カスタム入力ファイルを使用
+temci report --input my_results.yaml
 ```
 
 ### ビルド統合
@@ -168,8 +173,15 @@ temci clean --all
 ### `short-exec`
 タイミング測定付きの高速実行。
 ```bash
-temci short-exec [OPTIONS] <COMMAND> [ARGS]...
+temci short-exec [OPTIONS] <COMMANDS>...
 ```
+
+オプション：
+- `-r, --runs <RUNS>` - 実行回数（デフォルト：10）
+- `-w, --warmup <WARMUP>` - ウォームアップ実行回数（デフォルト：0）
+- `-S, --summary` - サマリーのみ表示
+- `-o, --output <OUTPUT>` - 結果の出力ファイル（デフォルト：temci_results.json）
+- `--no-save` - 結果をファイルに保存しない
 
 ### `exec`
 設定ファイルサポートを備えた完全なベンチマーク実行。
@@ -180,8 +192,13 @@ temci exec [OPTIONS]
 ### `report`
 保存されたベンチマーク結果からレポートを生成。
 ```bash
-temci report [OPTIONS] [--format FORMAT] [--output FILE]
+temci report [OPTIONS] [--input INPUT]
 ```
+
+オプション：
+- `-f, --format <FORMAT>` - レポートタイプ：console、csv、json、markdown（デフォルト：console）
+- `-o, --output <OUTPUT>` - 出力ファイル（デフォルト：標準出力）
+- `-i, --input <INPUT>` - 入力データファイル（デフォルト：temci_results.json）
 
 ### `build`
 ベンチマーク用のプログラムをコンパイル。

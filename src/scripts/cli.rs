@@ -71,6 +71,14 @@ pub enum Commands {
         /// Show summary
         #[arg(short = 'S', long)]
         summary: bool,
+
+        /// Output file for benchmark results (default: temci_results.json)
+        #[arg(short = 'o', long)]
+        output: Option<String>,
+
+        /// Don't save results to file
+        #[arg(long)]
+        no_save: bool,
     },
 
     /// Build benchmark executables
@@ -139,8 +147,8 @@ impl TemciCli {
             Commands::Exec { suite, runs, driver, no_affinity, summary } => {
                 Self::handle_exec(suite, runs, driver, no_affinity, summary).await
             }
-            Commands::ShortExec { commands, runs, warmup, summary } => {
-                Self::handle_short_exec(commands, runs, warmup, summary).await
+            Commands::ShortExec { commands, runs, warmup, summary, output, no_save } => {
+                Self::handle_short_exec(commands, runs, warmup, summary, output, no_save).await
             }
             Commands::Build { config, force, release } => {
                 build_cmd::build(config, force, release).await
@@ -175,8 +183,10 @@ impl TemciCli {
         runs: usize,
         warmup: usize,
         summary: bool,
+        output: Option<String>,
+        no_save: bool,
     ) -> AnyhowResult<()> {
-        short_exec::short_exec(commands, runs, warmup, summary).await
+        short_exec::short_exec(commands, runs, warmup, summary, output, no_save).await
     }
 
     #[allow(dead_code)]
@@ -247,9 +257,43 @@ mod tests {
             "--runs", "5",
         ]).unwrap();
         match cli.command {
-            Commands::ShortExec { commands, runs, .. } => {
+            Commands::ShortExec { commands, runs, output, no_save, .. } => {
                 assert_eq!(commands.len(), 2);
                 assert_eq!(runs, 5);
+                assert_eq!(output, None);
+                assert_eq!(no_save, false);
+            }
+            _ => panic!("Expected ShortExec command"),
+        }
+    }
+
+    #[test]
+    fn test_short_exec_with_output() {
+        let cli = TemciCli::try_parse_from([
+            "temci", "short-exec",
+            "echo test",
+            "--output", "results.json",
+        ]).unwrap();
+        match cli.command {
+            Commands::ShortExec { output, no_save, .. } => {
+                assert_eq!(output, Some("results.json".to_string()));
+                assert_eq!(no_save, false);
+            }
+            _ => panic!("Expected ShortExec command"),
+        }
+    }
+
+    #[test]
+    fn test_short_exec_with_no_save() {
+        let cli = TemciCli::try_parse_from([
+            "temci", "short-exec",
+            "echo test",
+            "--no-save",
+        ]).unwrap();
+        match cli.command {
+            Commands::ShortExec { output, no_save, .. } => {
+                assert_eq!(output, None);
+                assert_eq!(no_save, true);
             }
             _ => panic!("Expected ShortExec command"),
         }

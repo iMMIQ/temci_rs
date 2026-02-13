@@ -85,6 +85,8 @@ temci short-exec 'echo "Hello, World!"'
 temci short-exec --runs 20 'sleep 1'
 ```
 
+**注意**：`short-exec` 會自動將結果儲存到 `temci_results.json`，以便後續使用 `report` 指令。使用 `--no-save` 選項可以禁用此行為。
+
 ### 基準測試設定
 
 建立 YAML 設定檔（`temci.yaml`）：
@@ -115,7 +117,7 @@ temci exec
 從保存嘅結果生成報告：
 
 ```bash
-# 控制台輸出（預設）
+# 控制台輸出（預設）- 從 temci_results.json 讀取
 temci report
 
 # 保存到檔案
@@ -125,6 +127,9 @@ temci report --output results.txt
 temci report --format json --output results.json
 temci report --format csv --output results.csv
 temci report --format markdown --output results.md
+
+# 使用自訂輸入檔案
+temci report --input my_results.yaml
 ```
 
 ### 構建整合
@@ -168,8 +173,15 @@ temci clean --all
 ### `short-exec`
 快速執行並計時測量。
 ```bash
-temci short-exec [OPTIONS] <COMMAND> [ARGS]...
+temci short-exec [OPTIONS] <COMMANDS>...
 ```
+
+選項：
+- `-r, --runs <RUNS>` - 執行次數（預設：10）
+- `-w, --warmup <WARMUP>` - 預熱執行次數（預設：0）
+- `-S, --summary` - 僅顯示摘要
+- `-o, --output <OUTPUT>` - 結果輸出檔案（預設：temci_results.json）
+- `--no-save` - 唔儲存結果到檔案
 
 ### `exec`
 完整嘅基準測試執行，支援設定檔。
@@ -180,8 +192,13 @@ temci exec [OPTIONS]
 ### `report`
 從保存嘅基準測試結果生成報告。
 ```bash
-temci report [OPTIONS] [--format FORMAT] [--output FILE]
+temci report [OPTIONS] [--input INPUT]
 ```
+
+選項：
+- `-f, --format <FORMAT>` - 報告類型：console、csv、json、markdown（預設：console）
+- `-o, --output <OUTPUT>` - 輸出檔案（預設：標準輸出）
+- `-i, --input <INPUT>` - 輸入數據檔案（預設：temci_results.json）
 
 ### `build`
 編譯程式用於基準測試。

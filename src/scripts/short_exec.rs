@@ -11,6 +11,7 @@ use tracing::{info, debug};
 use crate::run::executor::{BenchmarkExecutor, BenchmarkConfig};
 use crate::run::stats::{Sample, Statistics};
 use crate::utils::time::duration_as_ms;
+use crate::scripts::report_cmd::save_results;
 
 /// Quick execution of commands with simple statistics
 ///
@@ -20,11 +21,15 @@ use crate::utils::time::duration_as_ms;
 /// * `runs` - Number of benchmark runs (default 10)
 /// * `warmup` - Number of warmup runs (default 0)
 /// * `summary` - Whether to show only a summary (default detailed output)
+/// * `output` - Optional output file path (default: temci_results.json)
+/// * `no_save` - If true, don't save results to file
 pub async fn short_exec(
     commands: Vec<String>,
     runs: usize,
     warmup: usize,
     summary: bool,
+    output: Option<String>,
+    no_save: bool,
 ) -> Result<()> {
     info!("Running short-exec with {} commands", commands.len());
 
@@ -33,6 +38,13 @@ pub async fn short_exec(
     let actual_warmup = if warmup == 0 && runs == 10 { 2 } else { warmup };
 
     debug!("Configuration: runs={}, warmup={}", actual_runs, actual_warmup);
+
+    // Determine output file path (default: temci_results.json)
+    let output_path = if no_save {
+        None
+    } else {
+        Some(output.unwrap_or_else(|| "temci_results.json".to_string()))
+    };
 
     // Create executor with default settings
     let mut executor = BenchmarkExecutor::default_executor();
@@ -97,6 +109,24 @@ pub async fn short_exec(
     // Print summary if requested or if multiple commands were run
     if summary || commands.len() > 1 {
         print_comparison_summary(&all_results);
+    }
+
+    // Save results to file if not disabled
+    if let Some(path) = output_path {
+        // Convert CommandBenchmarkResult to BenchmarkSummary for saving
+        let summaries: Vec<crate::run::executor::BenchmarkSummary> = all_results
+            .iter()
+            .map(|r| r.summary.clone())
+            .collect();
+
+        save_results("temci short-exec", &summaries, &path)
+            .with_context(|| format!("Failed to save results to {}", path))?;
+        info!("Results saved to {}", path);
+
+        // Also print a message about using report command
+        if !summary {
+            println!("\nResults saved to {}. Use 'temci report' to generate a formatted report.", path);
+        }
     }
 
     Ok(())
@@ -244,6 +274,8 @@ mod tests {
             5,
             1,
             true,
+            None,
+            true,
         ).await;
         assert!(result.is_ok());
         Ok(())
@@ -255,6 +287,8 @@ mod tests {
             vec!["echo test1".to_string(), "echo test2".to_string()],
             3,
             0,
+            true,
+            None,
             true,
         ).await;
         assert!(result.is_ok());

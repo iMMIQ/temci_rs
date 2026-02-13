@@ -85,6 +85,8 @@ temci short-exec 'echo "Hello, World!"'
 temci short-exec --runs 20 'sleep 1'
 ```
 
+**注意**：`short-exec` 会自动将结果保存到 `temci_results.json`，以便后续使用 `report` 命令。使用 `--no-save` 选项可以禁用此行为。
+
 ### 基准测试配置
 
 创建 YAML 配置文件（`temci.yaml`）：
@@ -115,7 +117,7 @@ temci exec
 从保存的结果生成报告：
 
 ```bash
-# 控制台输出（默认）
+# 控制台输出（默认）- 从 temci_results.json 读取
 temci report
 
 # 保存到文件
@@ -125,6 +127,9 @@ temci report --output results.txt
 temci report --format json --output results.json
 temci report --format csv --output results.csv
 temci report --format markdown --output results.md
+
+# 使用自定义输入文件
+temci report --input my_results.yaml
 ```
 
 ### 构建集成
@@ -168,8 +173,15 @@ temci clean --all
 ### `short-exec`
 快速执行并计时测量。
 ```bash
-temci short-exec [OPTIONS] <COMMAND> [ARGS]...
+temci short-exec [OPTIONS] <COMMANDS>...
 ```
+
+选项：
+- `-r, --runs <RUNS>` - 执行次数（默认：10）
+- `-w, --warmup <WARMUP>` - 预热运行次数（默认：0）
+- `-S, --summary` - 仅显示摘要
+- `-o, --output <OUTPUT>` - 结果输出文件（默认：temci_results.json）
+- `--no-save` - 不保存结果到文件
 
 ### `exec`
 完整的基准测试执行，支持配置文件。
@@ -180,8 +192,13 @@ temci exec [OPTIONS]
 ### `report`
 从保存的基准测试结果生成报告。
 ```bash
-temci report [OPTIONS] [--format FORMAT] [--output FILE]
+temci report [OPTIONS] [--input INPUT]
 ```
+
+选项：
+- `-f, --format <FORMAT>` - 报告类型：console、csv、json、markdown（默认：console）
+- `-o, --output <OUTPUT>` - 输出文件（默认：标准输出）
+- `-i, --input <INPUT>` - 输入数据文件（默认：temci_results.json）
 
 ### `build`
 编译程序用于基准测试。

@@ -85,6 +85,8 @@ Run a benchmark with multiple executions:
 temci short-exec --runs 20 'sleep 1'
 ```
 
+**Note**: `short-exec` automatically saves results to `temci_results.json` for later use with the `report` command. Use `--no-save` to disable this behavior.
+
 ### Benchmark Configuration
 
 Create a YAML configuration file (`temci.yaml`):
@@ -115,7 +117,7 @@ temci exec
 Generate a report from saved results:
 
 ```bash
-# Console output (default)
+# Console output (default) - reads from temci_results.json
 temci report
 
 # Save to file
@@ -125,6 +127,9 @@ temci report --output results.txt
 temci report --format json --output results.json
 temci report --format csv --output results.csv
 temci report --format markdown --output results.md
+
+# Use custom input file
+temci report --input my_results.yaml
 ```
 
 ### Build Integration
@@ -168,8 +173,15 @@ temci clean --all
 ### `short-exec`
 Quick execution with timing measurement.
 ```bash
-temci short-exec [OPTIONS] <COMMAND> [ARGS]...
+temci short-exec [OPTIONS] <COMMANDS>...
 ```
+
+Options:
+- `-r, --runs <RUNS>` - Number of executions (default: 10)
+- `-w, --warmup <WARMUP>` - Warmup runs (default: 0)
+- `-S, --summary` - Show summary only
+- `-o, --output <OUTPUT>` - Output file for results (default: temci_results.json)
+- `--no-save` - Don't save results to file
 
 ### `exec`
 Full benchmark execution with configuration file support.
@@ -180,8 +192,13 @@ temci exec [OPTIONS]
 ### `report`
 Generate reports from saved benchmark results.
 ```bash
-temci report [OPTIONS] [--format FORMAT] [--output FILE]
+temci report [OPTIONS] [--input INPUT]
 ```
+
+Options:
+- `-f, --format <FORMAT>` - Report type: console, csv, json, markdown (default: console)
+- `-o, --output <OUTPUT>` - Output file (default: stdout)
+- `-i, --input <INPUT>` - Input data file (default: temci_results.json)
 
 ### `build`
 Compile programs for benchmarking.
