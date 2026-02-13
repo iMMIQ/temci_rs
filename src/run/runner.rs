@@ -185,8 +185,15 @@ impl CommandRunner {
             .map_err(|e| TemciError::ExecutionError(format!("Execution failed: {}", e)))?;
 
         let duration = start.elapsed();
-        let stdout = String::from_utf8_lossy(&output.stdout).to_string();
-        let stderr = String::from_utf8_lossy(&output.stderr).to_string();
+        // Optimize: try from_utf8 first (no allocation if valid), fall back to lossy
+        let stdout = match String::from_utf8(output.stdout) {
+            Ok(s) => s,
+            Err(e) => String::from_utf8_lossy(&e.into_bytes()).to_string(),
+        };
+        let stderr = match String::from_utf8(output.stderr) {
+            Ok(s) => s,
+            Err(e) => String::from_utf8_lossy(&e.into_bytes()).to_string(),
+        };
         let exit_code = output.status.code();
         let success = output.status.success();
 
@@ -244,8 +251,15 @@ impl Runner for CommandRunner {
             .map_err(|e| TemciError::ExecutionError(format!("Async execution failed: {}", e)))?;
 
         let duration = start.elapsed();
-        let stdout = String::from_utf8_lossy(&output.stdout).to_string();
-        let stderr = String::from_utf8_lossy(&output.stderr).to_string();
+        // Optimize: try from_utf8 first (no allocation if valid), fall back to lossy
+        let stdout = match String::from_utf8(output.stdout) {
+            Ok(s) => s,
+            Err(e) => String::from_utf8_lossy(&e.into_bytes()).to_string(),
+        };
+        let stderr = match String::from_utf8(output.stderr) {
+            Ok(s) => s,
+            Err(e) => String::from_utf8_lossy(&e.into_bytes()).to_string(),
+        };
         let exit_code = output.status.code();
         let success = output.status.success();
 
@@ -388,5 +402,25 @@ mod tests {
 
         assert_eq!(runner.env.get("KEY"), Some(&"value".to_string()));
         assert_eq!(runner.timeout, Some(Duration::from_secs(1)));
+    }
+
+    #[test]
+    fn test_command_result_preserves_content() {
+        // Ensure optimization doesn't break content preservation
+        // \xc3\xa9 is the UTF-8 encoding of é
+        let stdout_bytes = b"valid utf8 \xc3\xa9";
+        let stderr_bytes = b"error message";
+
+        let result = CommandResult {
+            stdout: String::from_utf8_lossy(stdout_bytes).to_string(),
+            stderr: String::from_utf8_lossy(stderr_bytes).to_string(),
+            exit_code: Some(0),
+            duration: Duration::from_millis(100),
+            timeout: false,
+            success: true,
+        };
+
+        assert_eq!(result.stdout, "valid utf8 é");
+        assert_eq!(result.stderr, "error message");
     }
 }
