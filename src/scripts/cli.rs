@@ -4,7 +4,7 @@
 
 use clap::{Parser, Subcommand};
 use anyhow::Result as AnyhowResult;
-use crate::scripts::{exec, short_exec, build_cmd as build, clean, report_cmd as report, setup, completion};
+use crate::scripts::{exec, short_exec, build_cmd, clean, report_cmd as report, setup, completion};
 
 /// Advanced benchmarking tool
 #[derive(Parser, Debug)]
@@ -153,7 +153,7 @@ impl TemciCli {
                 Self::handle_short_exec(commands, runs, warmup, summary).await
             }
             Commands::Build { config, force, release } => {
-                Self::handle_build(config, force, release).await
+                build_cmd::build(config, force, release).await
             }
             Commands::Clean { all } => {
                 Self::handle_clean(all).await
