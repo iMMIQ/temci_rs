@@ -2,6 +2,16 @@
 //!
 //! Provides statistical functions for analyzing benchmark data including
 //! descriptive statistics, percentiles, outlier detection, and confidence intervals.
+//!
+//! # Implementation
+//!
+//! This module uses the following crates for statistical computations:
+//! - [`statrs`](https://docs.rs/statrs) for mean, median, and percentile calculations
+//! - [`stats-ci`](https://docs.rs/stats-ci) for confidence interval calculations
+//!
+//! Custom implementations are retained for:
+//! - Outlier detection using IQR method
+//! - Sample management utilities
 
 use std::time::Duration;
 use statrs::statistics::{Data, OrderStatistics, Statistics as StatrsStatistics};
