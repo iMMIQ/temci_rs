@@ -213,9 +213,7 @@ impl TemciCli {
     }
 
     async fn handle_setup(config: String, overwrite: bool) -> AnyhowResult<()> {
-        tracing::info!("Setup: config={} overwrite={}", config, overwrite);
-        // Placeholder - will be implemented by setup module
-        Ok(())
+        setup::setup(config, overwrite).await
     }
 
     async fn handle_completion(shell: Option<String>) -> AnyhowResult<()> {
