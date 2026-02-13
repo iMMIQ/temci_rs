@@ -4,11 +4,11 @@
 //! including checking for required tools and creating configuration files.
 
 use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use anyhow::{Result, Context};
-use tracing::{info, debug, warn};
+use tracing::{info, debug};
 
-use crate::build::builder::{CompilerType, OptimizationLevel};
+use crate::build::builder::CompilerType;
 
 /// Default configuration file name
 const DEFAULT_CONFIG_NAME: &str = "temci.yaml";

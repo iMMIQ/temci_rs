@@ -316,7 +316,7 @@ mod tests {
         let mut temp_file = NamedTempFile::new()?;
         writeln!(temp_file, r#"{{"name": "test", "results": []}}"#)?;
 
-        let result = report("console".to_string(), None, Some(temp_file.path().to_str().unwrap())).await;
+        let result = report("console".to_string(), None, Some(temp_file.path().to_str().unwrap().to_string())).await;
         assert!(result.is_ok());
 
         Ok(())

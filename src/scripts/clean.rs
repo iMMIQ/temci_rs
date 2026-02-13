@@ -17,7 +17,7 @@ pub async fn clean(all: bool) -> Result<()> {
     info!("Starting cleanup");
 
     let mut cleaned_paths = Vec::new();
-    let mut errors: Vec<String> = Vec::new();
+    let errors: Vec<String> = Vec::new();
 
     // Clean local .temci directory
     if let Ok(cleaned) = clean_local_temci_dir() {

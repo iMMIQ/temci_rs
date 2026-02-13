@@ -24,7 +24,7 @@ impl FormatType {
     /// Parse a string into a FormatType
     pub fn from_str(s: &str) -> Option<Self> {
         match s.to_lowercase().as_str() {
-            "text" => Some(FormatType::Text),
+            "text" | "console" => Some(FormatType::Text),
             "markdown" | "md" => Some(FormatType::Markdown),
             "json" => Some(FormatType::Json),
             "csv" => Some(FormatType::Csv),

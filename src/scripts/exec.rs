@@ -6,7 +6,7 @@
 //! - Generating reports in console or CSV format
 //! - Saving results to files
 
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::fs::File;
 use std::io::Write;
 use anyhow::{Result, Context};
