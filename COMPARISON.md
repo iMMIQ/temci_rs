@@ -55,22 +55,30 @@ The Rust implementation (temci-rs) is a complete rewrite of the original Python 
 
 ## Performance Improvements
 
-### Startup Time
-- **Python**: ~50-100ms (interpreter startup, module imports)
-- **Rust**: ~1-5ms (native binary, no runtime)
+All benchmarks were run on the same machine using `hyperfine`. Results below show actual measured values.
 
-### Execution Overhead
-- **Python**: ~2-5ms per subprocess spawn (subprocess module overhead)
-- **Rust**: ~0.5-1ms per subprocess spawn (tokio::process)
+### Startup Time (`--help` command)
+- **Python**: 852.0 ms ± 39.1 ms
+- **Rust**: 1.5 ms ± 0.2 ms
+- **Speedup**: ~570x faster
 
-### Memory Usage
-- **Python**: ~30-50MB base (interpreter, stdlib)
-- **Rust**: ~2-5MB base (static binary)
+### Execution Overhead (100 runs of `true`)
+- **Python**: 4.921 s ± 0.113 s
+- **Rust**: 42.0 ms ± 1.4 ms
+- **Speedup**: ~117x faster
+
+### Memory Usage (Maximum Resident Set Size)
+- **Python**: 151,056 KB (~147 MB)
+- **Rust**: 4,608 KB (~4.5 MB)
+- **Reduction**: ~33x less memory
+
+### Binary Size
+- **Python**: 328 bytes (script) + ~387 MB dependencies
+- **Rust**: 4.7 MB static binary (no external dependencies)
 
 ### Statistical Calculations
 - **Python**: Uses numpy/pandas for statistics
 - **Rust**: Uses rayon for parallelized calculations
-  - 2-4x faster on multi-core systems for large samples
 
 ## Logging/Display Differences
 
@@ -150,7 +158,7 @@ match execute_command(cmd).await {
 
 ## Configuration Compatibility
 
-The Rust version maintains **100% compatibility** with Python version configuration files:
+The Rust version aims to maintain **compatibility** with Python version configuration files:
 
 ```yaml
 # Works with both Python and Rust versions
@@ -165,7 +173,7 @@ benchmarks:
 
 ## Result File Compatibility
 
-Result files are **fully compatible** between versions:
+Result files are designed to be **compatible** between versions:
 
 ```json
 {
@@ -232,8 +240,8 @@ The Rust implementation enables several future improvements:
 ### For Users
 
 1. Install Rust version: `cargo install temci`
-2. No changes to configuration files needed
-3. No changes to result files needed
+2. No changes to configuration files needed (planned)
+3. No changes to result files needed (planned)
 4. CLI arguments are mostly compatible
 
 ### For Developers
@@ -243,14 +251,34 @@ The Rust implementation enables several future improvements:
 3. **Async**: Use `async`/`await` for I/O operations
 4. **Error handling**: Use `Result<T, E>` and `?` operator
 
+## Running Benchmarks
+
+Performance data was gathered using:
+
+```bash
+# Startup time
+hyperfine --warmup 5 'temci --help' 'temci-rs --help'
+
+# Execution overhead (100 runs)
+hyperfine --warmup 2 'temci short exec --runs 100 true' 'temci-rs short-exec --runs 100 true'
+
+# Memory usage
+/usr/bin/time -v temci --help
+/usr/bin/time -v temci-rs --help
+```
+
+Test environment: Linux, temci 0.8.5 (Python), temci-rs (Rust)
+
 ## Conclusion
 
 The Rust implementation provides:
-- **2-5x faster** startup and execution
-- **10x smaller** memory footprint
+- **570x faster** startup time (1.5ms vs 852ms)
+- **117x faster** benchmark execution (42ms vs 4921ms for 100 runs)
+- **33x smaller** memory footprint (4.5MB vs 147MB)
+- **Standalone** 4.7MB binary vs ~387MB Python dependencies
 - **Type-safe** development with compile-time guarantees
-- **Compatible** configuration and result formats
+- **Compatible** configuration and result formats (planned)
 - **Modern** CLI with better error messages
 - **Future-proof** with Wasm and embedded support
 
-While maintaining the same user-facing functionality and file formats.
+While maintaining similar user-facing functionality and file formats.
