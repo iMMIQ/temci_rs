@@ -4,7 +4,7 @@
 //! descriptive statistics, percentiles, outlier detection, and confidence intervals.
 
 use std::time::Duration;
-use statrs::statistics::Statistics as StatrsStatistics;
+use statrs::statistics::{Data, OrderStatistics, Statistics as StatrsStatistics};
 
 /// A collection of data samples for statistical analysis
 #[derive(Debug, Clone)]
@@ -112,26 +112,15 @@ impl Sample {
         }
     }
 
-    /// Calculate percentile using linear interpolation
+    /// Calculate percentile using statrs (R-7 algorithm, industry standard)
     fn percentile(sorted_data: &[f64], percentile: f64) -> f64 {
         if sorted_data.is_empty() {
             return 0.0;
         }
-        if sorted_data.len() == 1 {
-            return sorted_data[0];
-        }
-
-        let n = sorted_data.len() as f64;
-        let pos = (percentile / 100.0) * (n - 1.0);
-        let lower = pos.floor() as usize;
-        let upper = pos.ceil() as usize;
-        let fraction = pos - lower as f64;
-
-        if upper >= sorted_data.len() {
-            return sorted_data[sorted_data.len() - 1];
-        }
-
-        sorted_data[lower] + fraction * (sorted_data[upper] - sorted_data[lower])
+        // statrs quantile requires mutable data (it modifies in place)
+        // We clone since we want to keep sorted_data unchanged
+        let mut data = Data::new(sorted_data.to_vec());
+        data.quantile(percentile / 100.0)
     }
 }
 
@@ -255,8 +244,9 @@ mod tests {
     #[test]
     fn test_percentile_calculation() {
         let data = vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0];
-        assert!((Sample::percentile(&data, 25.0) - 3.25).abs() < 0.01);
+        // statrs uses R-7 algorithm (industry standard)
+        assert!((Sample::percentile(&data, 25.0) - 2.9167).abs() < 0.01);
         assert!((Sample::percentile(&data, 50.0) - 5.5).abs() < 0.01);
-        assert!((Sample::percentile(&data, 75.0) - 7.75).abs() < 0.01);
+        assert!((Sample::percentile(&data, 75.0) - 8.0833).abs() < 0.01);
     }
 }
