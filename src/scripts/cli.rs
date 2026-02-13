@@ -1,12 +1,279 @@
-use clap::Parser;
+//! Command-line interface for temci
+//!
+//! Provides the main CLI parser and command dispatching.
 
+use clap::{Parser, Subcommand};
+use anyhow::Result as AnyhowResult;
+
+/// Advanced benchmarking tool
 #[derive(Parser, Debug)]
+#[command(name = "temci")]
+#[command(author = "Johannes Hofmeister <johannes.hofmeister@gmail.com>")]
+#[command(version = "0.8.5")]
+#[command(about = "Advanced benchmarking tool with multiple run drivers and statistical analysis", long_about = None)]
 pub struct TemciCli {
+    /// Increase verbosity (can be used multiple times)
     #[arg(short, long, action = clap::ArgAction::Count)]
     pub verbose: u8,
+
+    /// Configuration file path
+    #[arg(short, long)]
+    pub config: Option<String>,
+
+    /// Subcommand to execute
+    #[command(subcommand)]
+    pub command: Commands,
 }
 
-pub async fn run(cli: TemciCli) -> anyhow::Result<()> {
-    tracing::info!("temci CLI started with verbosity: {}", cli.verbose);
-    Ok(())
+/// Available subcommands
+#[derive(Subcommand, Debug)]
+pub enum Commands {
+    /// Execute benchmarks with full configuration
+    Exec {
+        /// Benchmark suite configuration
+        #[arg(short, long)]
+        suite: Option<String>,
+
+        /// Number of executions per benchmark
+        #[arg(short = 'r', long)]
+        runs: Option<usize>,
+
+        /// Run driver to use (basic, perf, perf_stat, perf_record, valgrind)
+        #[arg(long)]
+        driver: Option<String>,
+
+        /// Disable CPU affinity
+        #[arg(long)]
+        no_affinity: bool,
+
+        /// Show only summary
+        #[arg(short = 'S', long)]
+        summary: bool,
+    },
+
+    /// Quick execution of commands
+    ShortExec {
+        /// Commands to execute
+        #[arg(required = true)]
+        commands: Vec<String>,
+
+        /// Number of executions
+        #[arg(short = 'r', long, default_value = "10")]
+        runs: usize,
+
+        /// Warmup runs
+        #[arg(short = 'w', long, default_value = "0")]
+        warmup: usize,
+
+        /// Show summary
+        #[arg(short = 'S', long)]
+        summary: bool,
+    },
+
+    /// Build benchmark executables
+    Build {
+        /// Build configuration
+        #[arg(short = 'c', long)]
+        config: Option<String>,
+
+        /// Force rebuild
+        #[arg(long)]
+        force: bool,
+
+        /// Release build
+        #[arg(long)]
+        release: bool,
+    },
+
+    /// Clean build artifacts
+    Clean {
+        /// Clean all artifacts
+        #[arg(long)]
+        all: bool,
+    },
+
+    /// Generate benchmark report
+    Report {
+        /// Report type (console, csv, json)
+        #[arg(short = 'f', long, default_value = "console")]
+        format: String,
+
+        /// Output file
+        #[arg(short = 'o', long)]
+        output: Option<String>,
+
+        /// Input data file
+        #[arg(short = 'i', long)]
+        input: Option<String>,
+    },
+
+    /// Setup initial configuration
+    Setup {
+        /// Configuration file to create
+        #[arg(short = 'c', long, default_value = "temci.yaml")]
+        config: String,
+
+        /// Overwrite existing config
+        #[arg(long)]
+        overwrite: bool,
+    },
+
+    /// Generate shell completion
+    Completion {
+        /// Shell type (bash, zsh, fish, elvish)
+        #[arg(short = 's', long)]
+        shell: Option<String>,
+    },
+}
+
+impl TemciCli {
+    /// Run the CLI with the given arguments
+    pub async fn run(self) -> AnyhowResult<()> {
+        // Initialize tracing based on verbosity
+        let level = match self.verbose {
+            0 => tracing::Level::WARN,
+            1 => tracing::Level::INFO,
+            2 => tracing::Level::DEBUG,
+            _ => tracing::Level::TRACE,
+        };
+
+        tracing_subscriber::fmt()
+            .with_max_level(level)
+            .init();
+
+        tracing::info!("temci started");
+
+        // Dispatch to command handler
+        match self.command {
+            Commands::Exec { suite, runs, driver, no_affinity, summary } => {
+                Self::handle_exec(suite, runs, driver, no_affinity, summary).await
+            }
+            Commands::ShortExec { commands, runs, warmup, summary } => {
+                Self::handle_short_exec(commands, runs, warmup, summary).await
+            }
+            Commands::Build { config, force, release } => {
+                Self::handle_build(config, force, release).await
+            }
+            Commands::Clean { all } => {
+                Self::handle_clean(all).await
+            }
+            Commands::Report { format, output, input } => {
+                Self::handle_report(format, output, input).await
+            }
+            Commands::Setup { config, overwrite } => {
+                Self::handle_setup(config, overwrite).await
+            }
+            Commands::Completion { shell } => {
+                Self::handle_completion(shell).await
+            }
+        }
+    }
+
+    async fn handle_exec(
+        _suite: Option<String>,
+        _runs: Option<usize>,
+        _driver: Option<String>,
+        _no_affinity: bool,
+        _summary: bool,
+    ) -> AnyhowResult<()> {
+        tracing::info!("Executing benchmarks");
+        // Placeholder - will be implemented by exec module
+        Ok(())
+    }
+
+    async fn handle_short_exec(
+        commands: Vec<String>,
+        runs: usize,
+        warmup: usize,
+        summary: bool,
+    ) -> AnyhowResult<()> {
+        tracing::info!("Short exec: {:?} runs={} warmup={} summary={}",
+                       commands, runs, warmup, summary);
+        // Placeholder - will be implemented by short_exec module
+        Ok(())
+    }
+
+    async fn handle_build(
+        config: Option<String>,
+        force: bool,
+        release: bool,
+    ) -> AnyhowResult<()> {
+        tracing::info!("Build: config={:?} force={} release={}",
+                       config, force, release);
+        // Placeholder - will be implemented by build_cmd module
+        Ok(())
+    }
+
+    async fn handle_clean(all: bool) -> AnyhowResult<()> {
+        tracing::info!("Clean: all={}", all);
+        // Placeholder - will be implemented by clean module
+        Ok(())
+    }
+
+    async fn handle_report(
+        format: String,
+        output: Option<String>,
+        input: Option<String>,
+    ) -> AnyhowResult<()> {
+        tracing::info!("Report: format={} output={:?} input={:?}",
+                       format, output, input);
+        // Placeholder - will be implemented by report_cmd module
+        Ok(())
+    }
+
+    async fn handle_setup(config: String, overwrite: bool) -> AnyhowResult<()> {
+        tracing::info!("Setup: config={} overwrite={}", config, overwrite);
+        // Placeholder - will be implemented by setup module
+        Ok(())
+    }
+
+    async fn handle_completion(shell: Option<String>) -> AnyhowResult<()> {
+        tracing::info!("Completion: shell={:?}", shell);
+        // Placeholder - will be implemented by completion module
+        Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_cli_parsing() {
+        let cli = TemciCli::try_parse_from(["temci", "--verbose", "exec"]).unwrap();
+        assert_eq!(cli.verbose, 1);
+    }
+
+    #[test]
+    fn test_exec_command() {
+        let cli = TemciCli::try_parse_from([
+            "temci", "exec",
+            "--suite", "my_suite",
+            "--runs", "10",
+        ]).unwrap();
+        match cli.command {
+            Commands::Exec { suite, runs, .. } => {
+                assert_eq!(suite, Some("my_suite".to_string()));
+                assert_eq!(runs, Some(10));
+            }
+            _ => panic!("Expected Exec command"),
+        }
+    }
+
+    #[test]
+    fn test_short_exec_command() {
+        let cli = TemciCli::try_parse_from([
+            "temci", "short-exec",
+            "echo hello",
+            "echo world",
+            "--runs", "5",
+        ]).unwrap();
+        match cli.command {
+            Commands::ShortExec { commands, runs, .. } => {
+                assert_eq!(commands.len(), 2);
+                assert_eq!(runs, 5);
+            }
+            _ => panic!("Expected ShortExec command"),
+        }
+    }
 }
