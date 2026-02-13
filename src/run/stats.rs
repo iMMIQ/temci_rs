@@ -198,8 +198,8 @@ impl Statistics {
         let sorted = sample.sorted_data();
         let n = sample.len();
 
-        // Compute mean first (statrs::mean consumes the data)
-        let mean = sorted.clone().mean();
+        // Compute mean from unsorted data (no clone needed)
+        let mean = sample.data().mean();
         let min = sorted.first().copied();
         let max = sorted.last().copied();
 
