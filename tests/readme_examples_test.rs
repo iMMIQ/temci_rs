@@ -294,8 +294,13 @@ fn test_readme_completion_bash() {
     assert!(output.status.success());
 
     let stdout = String::from_utf8_lossy(&output.stdout);
-    // Bash completion should contain completion markers
-    assert!(stdout.len() > 0);
+    // Bash completion should contain completion script markers
+    assert!(!stdout.is_empty(), "Completion output should not be empty");
+    // Check for actual bash completion content
+    assert!(
+        stdout.contains("complete") || stdout.contains("_temci"),
+        "Completion output should contain bash completion markers"
+    );
 }
 
 #[test]
@@ -304,6 +309,15 @@ fn test_readme_completion_with_shell_option() {
     let output = run_temci(&["completion", "-s", "bash"]).unwrap();
 
     assert!(output.status.success());
+
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    // Verify the output is not empty
+    assert!(!stdout.is_empty(), "Completion output should not be empty");
+    // Check for actual bash completion content
+    assert!(
+        stdout.contains("complete") || stdout.contains("_temci"),
+        "Completion output should contain bash completion markers"
+    );
 }
 
 #[test]
