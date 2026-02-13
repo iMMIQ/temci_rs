@@ -105,7 +105,7 @@ pub enum Commands {
 
     /// Generate benchmark report
     Report {
-        /// Report type (console, csv, json)
+        /// Report type (console, csv, json, markdown)
         #[arg(short = 'f', long, default_value = "console")]
         format: String,
 
