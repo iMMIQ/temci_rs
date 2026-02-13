@@ -1,5 +1,5 @@
 use std::time::Duration;
-use temci::run::executor::{BenchmarkConfig, BenchmarkSummary, RunResult};
+use temci::run::executor::{BenchmarkSummary, RunResult};
 use temci::run::report::{FormatType, Report};
 use temci::run::runner::CommandResult;
 use temci::run::stats::Sample;

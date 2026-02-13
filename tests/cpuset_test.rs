@@ -1,4 +1,4 @@
-use temci::run::cpuset::{CpuSet, CpuSetError};
+use temci::run::cpuset::CpuSet;
 
 #[test]
 fn test_cpuset_empty() {

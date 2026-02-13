@@ -1,4 +1,4 @@
-use temci::utils::{TemciError, Result};
+use temci::utils::TemciError;
 
 #[test]
 fn test_error_display() {
