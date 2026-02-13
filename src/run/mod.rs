@@ -5,3 +5,4 @@ pub mod runner;
 pub mod worker_pool;
 
 pub use runner::{CommandRunner, CommandResult, RunDriver, PerfRunner, Runner};
+pub use worker_pool::{WorkerPool, Permit};
