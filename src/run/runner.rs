@@ -9,6 +9,7 @@ use std::collections::HashMap;
 use std::process::{Command, Stdio};
 use std::time::{Duration, Instant};
 use tokio::process::Command as TokioCommand;
+use tokio::time::timeout as tokio_timeout;
 use async_trait::async_trait;
 use tracing::{debug, trace};
 
@@ -244,10 +245,31 @@ impl Runner for CommandRunner {
 
         debug!("Executing async command: {:?}", cmd);
 
-        let output = cmd
-            .output()
-            .await
-            .map_err(|e| TemciError::ExecutionError(format!("Async execution failed: {}", e)))?;
+        let output_future = cmd.output();
+
+        let output = if let Some(dur) = &self.timeout {
+            match tokio_timeout(*dur, output_future).await {
+                Ok(Ok(out)) => out,
+                Ok(Err(e)) => {
+                    return Err(TemciError::ExecutionError(format!("Async execution failed: {}", e)));
+                }
+                Err(_) => {
+                    // Timeout occurred
+                    return Ok(CommandResult {
+                        stdout: String::new(),
+                        stderr: String::new(),
+                        exit_code: None,
+                        duration: start.elapsed(),
+                        timeout: true,
+                        success: false,
+                    });
+                }
+            }
+        } else {
+            output_future
+                .await
+                .map_err(|e| TemciError::ExecutionError(format!("Async execution failed: {}", e)))?
+        };
 
         let duration = start.elapsed();
         let stdout = Self::bytes_to_string(output.stdout);
@@ -426,5 +448,17 @@ mod tests {
         assert!(cmd.contains(&"echo".to_string()));
         assert!(cmd.contains(&"hello".to_string()));
         assert!(cmd.contains(&"world".to_string()));
+    }
+
+    #[tokio::test]
+    async fn test_command_timeout() {
+        let mut runner = CommandRunner::new();
+        runner.set_timeout(Some(Duration::from_millis(100)));
+
+        // This should timeout (sleep command)
+        let result = runner.run("sleep", &["2"]).await;
+
+        // Expect timeout or error
+        assert!(result.is_err() || result.unwrap().timeout);
     }
 }
