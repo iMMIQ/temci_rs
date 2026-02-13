@@ -91,3 +91,169 @@ benchmarks:
     let stdout = String::from_utf8_lossy(&output.stdout);
     assert!(stdout.contains("sleep test") || stdout.contains("command test"));
 }
+
+#[test]
+fn test_readme_report_console() {
+    // Create mock results first
+    let temp_dir = TempDir::new().unwrap();
+    let results_path = temp_dir.path().join("temci_results.json");
+
+    fs::write(
+        &results_path,
+        r#"{
+  "name": "test suite",
+  "timestamp": "2024-01-01T00:00:00Z",
+  "results": [
+    {
+      "command": "echo",
+      "args": ["test"],
+      "runs": 5,
+      "successful": 5,
+      "failed": 0,
+      "min_ms": 1.0,
+      "max_ms": 5.0,
+      "avg_ms": 2.5,
+      "total_ms": 12.5
+    }
+  ]
+}"#,
+    )
+    .unwrap();
+
+    // README example: temci report
+    let output = run_temci(&["report", "--input", results_path.to_str().unwrap()]).unwrap();
+
+    assert!(output.status.success(),
+            "Command failed: {:?}",
+            String::from_utf8_lossy(&output.stderr));
+}
+
+#[test]
+fn test_readme_report_json() {
+    let temp_dir = TempDir::new().unwrap();
+    let results_path = temp_dir.path().join("temci_results.json");
+    let output_path = temp_dir.path().join("results.json");
+
+    fs::write(
+        &results_path,
+        r#"{
+  "name": "test",
+  "timestamp": "2024-01-01T00:00:00Z",
+  "results": [
+    {
+      "command": "echo",
+      "args": ["test"],
+      "runs": 1,
+      "successful": 1,
+      "failed": 0,
+      "min_ms": 1.0,
+      "max_ms": 5.0,
+      "avg_ms": 2.5,
+      "total_ms": 12.5
+    }
+  ]
+}"#,
+    )
+    .unwrap();
+
+    // README example: temci report --format json --output results.json
+    let output = run_temci(&[
+        "report",
+        "--format",
+        "json",
+        "--output",
+        output_path.to_str().unwrap(),
+        "--input",
+        results_path.to_str().unwrap(),
+    ])
+    .unwrap();
+
+    assert!(output.status.success());
+    assert!(output_path.exists());
+}
+
+#[test]
+fn test_readme_report_csv() {
+    let temp_dir = TempDir::new().unwrap();
+    let results_path = temp_dir.path().join("temci_results.json");
+    let output_path = temp_dir.path().join("results.csv");
+
+    fs::write(
+        &results_path,
+        r#"{
+  "name": "test",
+  "timestamp": "2024-01-01T00:00:00Z",
+  "results": [
+    {
+      "command": "echo",
+      "args": ["test"],
+      "runs": 1,
+      "successful": 1,
+      "failed": 0,
+      "min_ms": 1.0,
+      "max_ms": 5.0,
+      "avg_ms": 2.5,
+      "total_ms": 12.5
+    }
+  ]
+}"#,
+    )
+    .unwrap();
+
+    // README example: temci report --format csv --output results.csv
+    let output = run_temci(&[
+        "report",
+        "--format",
+        "csv",
+        "--output",
+        output_path.to_str().unwrap(),
+        "--input",
+        results_path.to_str().unwrap(),
+    ])
+    .unwrap();
+
+    assert!(output.status.success());
+    assert!(output_path.exists());
+}
+
+#[test]
+fn test_readme_report_markdown() {
+    let temp_dir = TempDir::new().unwrap();
+    let results_path = temp_dir.path().join("temci_results.json");
+
+    fs::write(
+        &results_path,
+        r#"{
+  "name": "test",
+  "timestamp": "2024-01-01T00:00:00Z",
+  "results": [
+    {
+      "command": "echo",
+      "args": ["test"],
+      "runs": 1,
+      "successful": 1,
+      "failed": 0,
+      "min_ms": 1.0,
+      "max_ms": 5.0,
+      "avg_ms": 2.5,
+      "total_ms": 12.5
+    }
+  ]
+}"#,
+    )
+    .unwrap();
+
+    // README example: temci report --format markdown --output results.md
+    let output = run_temci(&[
+        "report",
+        "--format",
+        "markdown",
+        "--output",
+        temp_dir.path().join("results.md").to_str().unwrap(),
+        "--input",
+        results_path.to_str().unwrap(),
+    ])
+    .unwrap();
+
+    assert!(output.status.success());
+}
