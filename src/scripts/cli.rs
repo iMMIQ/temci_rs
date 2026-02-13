@@ -219,9 +219,7 @@ impl TemciCli {
     }
 
     async fn handle_completion(shell: Option<String>) -> AnyhowResult<()> {
-        tracing::info!("Completion: shell={:?}", shell);
-        // Placeholder - will be implemented by completion module
-        Ok(())
+        completion::completion(shell).await
     }
 }
 
