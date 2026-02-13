@@ -3,3 +3,5 @@ pub mod driver;
 pub mod executor;
 pub mod runner;
 pub mod worker_pool;
+
+pub use runner::{CommandRunner, CommandResult, RunDriver, PerfRunner, Runner};

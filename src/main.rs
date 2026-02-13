@@ -28,7 +28,7 @@ async fn main() -> anyhow::Result<()> {
     tracing::subscriber::set_global_default(subscriber)
         .expect("setting tracing subscriber failed");
 
-    if let Err(e) = temci::scripts::cli::run(cli).await {
+    if let Err(e) = cli.run().await {
         tracing::error!("Error: {}", e);
         std::process::exit(1);
     }

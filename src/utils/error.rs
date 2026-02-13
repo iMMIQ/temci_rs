@@ -14,6 +14,9 @@ pub enum TemciError {
     #[error("Report error: {0}")]
     Report(String),
 
+    #[error("Execution error: {0}")]
+    ExecutionError(String),
+
     #[error("IO error: {0}")]
     Io(#[from] std::io::Error),
 

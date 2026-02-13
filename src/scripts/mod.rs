@@ -6,3 +6,5 @@ pub mod exec;
 pub mod report_cmd;
 pub mod setup;
 pub mod short_exec;
+
+pub use cli::TemciCli;
