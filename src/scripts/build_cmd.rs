@@ -10,8 +10,10 @@ pub async fn build(
     _config: Option<String>,
     _force: bool,
     _release: bool,
+    _compiler: Option<String>,
+    _opt_level: Option<String>,
 ) -> Result<()> {
-    // TODO: Implement full build command
-    // For now, just return success
+    tracing::info!("Build: config={:?} force={} release={} compiler={:?} opt_level={:?}",
+                   _config, _force, _release, _compiler, _opt_level);
     Ok(())
 }

@@ -94,6 +94,14 @@ pub enum Commands {
         /// Release build
         #[arg(long)]
         release: bool,
+
+        /// Compiler to use (gcc, clang, rustc)
+        #[arg(long, value_name = "COMPILER")]
+        compiler: Option<String>,
+
+        /// Optimization level (O0, O1, O2, O3, Os, Oz)
+        #[arg(long, value_name = "LEVEL")]
+        opt_level: Option<String>,
     },
 
     /// Clean build artifacts
@@ -154,8 +162,8 @@ impl TemciCli {
             Commands::ShortExec { commands, runs, warmup, summary, output, no_save } => {
                 Self::handle_short_exec(commands, runs, warmup, summary, output, no_save).await
             }
-            Commands::Build { config, force, release } => {
-                build_cmd::build(config, force, release).await
+            Commands::Build { config, force, release, compiler, opt_level } => {
+                build_cmd::build(config, force, release, compiler, opt_level).await
             }
             Commands::Clean { all } => {
                 Self::handle_clean(all).await
@@ -198,9 +206,11 @@ impl TemciCli {
         config: Option<String>,
         force: bool,
         release: bool,
+        compiler: Option<String>,
+        opt_level: Option<String>,
     ) -> AnyhowResult<()> {
-        tracing::info!("Build: config={:?} force={} release={}",
-                       config, force, release);
+        tracing::info!("Build: config={:?} force={} release={} compiler={:?} opt_level={:?}",
+                       config, force, release, compiler, opt_level);
         // Placeholder - will be implemented by build_cmd module
         Ok(())
     }
