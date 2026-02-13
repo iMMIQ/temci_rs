@@ -186,10 +186,7 @@ impl TemciCli {
         warmup: usize,
         summary: bool,
     ) -> AnyhowResult<()> {
-        tracing::info!("Short exec: {:?} runs={} warmup={} summary={}",
-                       commands, runs, warmup, summary);
-        // Placeholder - will be implemented by short_exec module
-        Ok(())
+        short_exec::short_exec(commands, runs, warmup, summary).await
     }
 
     async fn handle_build(
