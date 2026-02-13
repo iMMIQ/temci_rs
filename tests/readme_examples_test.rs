@@ -257,3 +257,64 @@ fn test_readme_report_markdown() {
 
     assert!(output.status.success());
 }
+
+#[test]
+fn test_readme_build_with_compiler() {
+    // README example: temci build --compiler gcc --opt-level O3
+    let output = run_temci(&["build", "--compiler", "gcc", "--opt-level", "O3"]).unwrap();
+
+    // Should succeed (even if stubbed)
+    assert!(output.status.success(),
+            "Command failed: {:?}",
+            String::from_utf8_lossy(&output.stderr));
+}
+
+#[test]
+fn test_readme_setup() {
+    let temp_dir = TempDir::new().unwrap();
+    let config_path = temp_dir.path().join("temci.yaml");
+
+    // README example: temci setup
+    let output = run_temci(&[
+        "setup",
+        "--config",
+        config_path.to_str().unwrap(),
+    ])
+    .unwrap();
+
+    assert!(output.status.success());
+    assert!(config_path.exists());
+}
+
+#[test]
+fn test_readme_completion_bash() {
+    // README example: temci completion bash
+    let output = run_temci(&["completion", "bash"]).unwrap();
+
+    assert!(output.status.success());
+
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    // Bash completion should contain completion markers
+    assert!(stdout.len() > 0);
+}
+
+#[test]
+fn test_readme_completion_with_shell_option() {
+    // README example: temci completion -s bash
+    let output = run_temci(&["completion", "-s", "bash"]).unwrap();
+
+    assert!(output.status.success());
+}
+
+#[test]
+fn test_readme_clean() {
+    // README example: temci clean
+    let output = run_temci(&["clean"]).unwrap();
+
+    assert!(output.status.success());
+
+    // README example: temci clean --all
+    let output = run_temci(&["clean", "--all"]).unwrap();
+
+    assert!(output.status.success());
+}
