@@ -211,7 +211,9 @@ impl Statistics {
             };
         }
 
-        let sorted = sample.sorted_data();
+        // Sort once and reuse for all percentile calculations
+        let mut sorted = sample.data().to_vec();
+        sorted.sort_unstable_by(|a, b| a.total_cmp(b));
         let n = sample.len();
 
         // Compute mean from unsorted data (no clone needed)
@@ -232,12 +234,15 @@ impl Statistics {
 
         let std_dev = variance.map(|v| v.sqrt());
 
-        let p25 = Some(Sample::percentile(&sorted, 25.0));
-        let p50 = Some(Sample::percentile(&sorted, 50.0));
-        let p75 = Some(Sample::percentile(&sorted, 75.0));
-        let p90 = Some(Sample::percentile(&sorted, 90.0));
-        let p95 = Some(Sample::percentile(&sorted, 95.0));
-        let p99 = Some(Sample::percentile(&sorted, 99.0));
+        // Create statrs Data object once and reuse for all percentiles
+        // This avoids 6 unnecessary clones for p25, p50, p75, p90, p95, p99
+        let mut data = Data::new(sorted);
+        let p25 = Some(data.quantile(0.25));
+        let p50 = Some(data.quantile(0.50));
+        let p75 = Some(data.quantile(0.75));
+        let p90 = Some(data.quantile(0.90));
+        let p95 = Some(data.quantile(0.95));
+        let p99 = Some(data.quantile(0.99));
 
         Self {
             mean: Some(mean),
