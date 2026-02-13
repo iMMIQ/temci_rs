@@ -130,19 +130,7 @@ pub enum Commands {
 impl TemciCli {
     /// Run the CLI with the given arguments
     pub async fn run(self) -> AnyhowResult<()> {
-        // Initialize tracing based on verbosity
-        let level = match self.verbose {
-            0 => tracing::Level::WARN,
-            1 => tracing::Level::INFO,
-            2 => tracing::Level::DEBUG,
-            _ => tracing::Level::TRACE,
-        };
-
-        tracing_subscriber::fmt()
-            .with_max_level(level)
-            .init();
-
-        tracing::info!("temci started");
+        // Note: tracing is initialized in main.rs
 
         // Dispatch to command handler
         match self.command {
