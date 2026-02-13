@@ -4,6 +4,7 @@
 //! descriptive statistics, percentiles, outlier detection, and confidence intervals.
 
 use std::time::Duration;
+use statrs::statistics::Statistics as StatrsStatistics;
 
 /// A collection of data samples for statistical analysis
 #[derive(Debug, Clone)]
@@ -197,7 +198,8 @@ impl Statistics {
         let sorted = sample.sorted_data();
         let n = sample.len();
 
-        let mean = sorted.iter().sum::<f64>() / n as f64;
+        // Compute mean first (statrs::mean consumes the data)
+        let mean = sorted.clone().mean();
         let min = sorted.first().copied();
         let max = sorted.last().copied();
 
