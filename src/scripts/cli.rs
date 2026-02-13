@@ -214,10 +214,7 @@ impl TemciCli {
         output: Option<String>,
         input: Option<String>,
     ) -> AnyhowResult<()> {
-        tracing::info!("Report: format={} output={:?} input={:?}",
-                       format, output, input);
-        // Placeholder - will be implemented by report_cmd module
-        Ok(())
+        report::report(format, output, input).await
     }
 
     async fn handle_setup(config: String, overwrite: bool) -> AnyhowResult<()> {
