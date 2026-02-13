@@ -310,7 +310,7 @@ impl PerfRunner {
 
     /// Build a perf stat command
     pub(crate) fn build_perf_command(&self, program: &str, args: &[&str]) -> Vec<String> {
-        let mut cmd = Vec::with_capacity(6 + args.len());
+        let mut cmd = Vec::with_capacity(7 + args.len());
         cmd.push("perf".to_string());
         cmd.push("stat".to_string());
         cmd.push("-x,".to_string());  // CSV output
