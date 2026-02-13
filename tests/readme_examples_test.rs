@@ -24,3 +24,32 @@ fn temci_bin() -> PathBuf {
 fn run_temci(args: &[&str]) -> Result<std::process::Output, std::io::Error> {
     Command::new(&temci_bin()).args(args).output()
 }
+
+#[test]
+fn test_readme_short_exec_basic() {
+    // README example: temci short-exec 'echo "Hello, World!"'
+    let output = run_temci(&["short-exec", "echo \"Hello, World!\""]).unwrap();
+
+    assert!(output.status.success(),
+            "Command failed: {:?}",
+            String::from_utf8_lossy(&output.stderr));
+
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    // The command is echoed at the start (with escaped characters)
+    assert!(stdout.contains("echo") && stdout.contains("Hello"));
+    assert!(stdout.contains("Runs:") || stdout.contains("runs"));
+}
+
+#[test]
+fn test_readme_short_exec_with_runs() {
+    // README example: temci short-exec --runs 20 'sleep 1'
+    // Using shorter sleep for test speed
+    let output = run_temci(&["short-exec", "--runs", "3", "sleep", "0.01"]).unwrap();
+
+    assert!(output.status.success(),
+            "Command failed: {:?}",
+            String::from_utf8_lossy(&output.stderr));
+
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    assert!(stdout.contains("Runs: 3") || stdout.contains("runs: 3"));
+}
