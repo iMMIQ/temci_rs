@@ -276,4 +276,45 @@ mod tests {
         assert!((Sample::percentile(&data, 50.0) - 5.5).abs() < 0.01);
         assert!((Sample::percentile(&data, 75.0) - 8.0833).abs() < 0.01);
     }
+
+    #[test]
+    fn test_statistics_percentiles_consistency() {
+        // Ensure multiple calls produce same results
+        let data = vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0];
+        let sample = Sample::new(data.clone());
+
+        let stats1 = Statistics::from_sample(&sample);
+        let stats2 = Statistics::from_sample(&sample);
+
+        assert_eq!(stats1.p25, stats2.p25);
+        assert_eq!(stats1.p50, stats2.p50);
+        assert_eq!(stats1.p75, stats2.p75);
+        assert_eq!(stats1.p90, stats2.p90);
+        assert_eq!(stats1.p95, stats2.p95);
+        assert_eq!(stats1.p99, stats2.p99);
+    }
+
+    #[test]
+    fn test_statistics_from_large_sample() {
+        // Test with larger dataset to catch allocation issues
+        let data: Vec<f64> = (1..=1000).map(|i| i as f64).collect();
+        let sample = Sample::new(data);
+
+        let stats = Statistics::from_sample(&sample);
+        assert_eq!(stats.min, Some(1.0));
+        assert_eq!(stats.max, Some(1000.0));
+        assert_eq!(stats.median, Some(500.5));
+    }
+
+    #[test]
+    fn test_outlier_detection_consistency() {
+        let data = vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 100.0];
+        let sample = Sample::new(data.clone());
+
+        let outliers1 = sample.detect_outliers(1.5);
+        let outliers2 = sample.detect_outliers(1.5);
+
+        assert_eq!(outliers1, outliers2);
+        assert!(outliers1.contains(&100.0));
+    }
 }
