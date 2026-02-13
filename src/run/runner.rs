@@ -172,6 +172,12 @@ impl CommandRunner {
         cmd
     }
 
+    /// Helper function to convert bytes to String, handling invalid UTF-8 gracefully
+    fn bytes_to_string(bytes: Vec<u8>) -> String {
+        String::from_utf8(bytes)
+            .unwrap_or_else(|e| String::from_utf8_lossy(&e.into_bytes()).to_string())
+    }
+
     /// Execute the command and capture output
     fn execute_command(&self, cmd: &mut Command) -> Result<CommandResult> {
         let start = Instant::now();
@@ -185,15 +191,8 @@ impl CommandRunner {
             .map_err(|e| TemciError::ExecutionError(format!("Execution failed: {}", e)))?;
 
         let duration = start.elapsed();
-        // Optimize: try from_utf8 first (no allocation if valid), fall back to lossy
-        let stdout = match String::from_utf8(output.stdout) {
-            Ok(s) => s,
-            Err(e) => String::from_utf8_lossy(&e.into_bytes()).to_string(),
-        };
-        let stderr = match String::from_utf8(output.stderr) {
-            Ok(s) => s,
-            Err(e) => String::from_utf8_lossy(&e.into_bytes()).to_string(),
-        };
+        let stdout = Self::bytes_to_string(output.stdout);
+        let stderr = Self::bytes_to_string(output.stderr);
         let exit_code = output.status.code();
         let success = output.status.success();
 
@@ -251,15 +250,8 @@ impl Runner for CommandRunner {
             .map_err(|e| TemciError::ExecutionError(format!("Async execution failed: {}", e)))?;
 
         let duration = start.elapsed();
-        // Optimize: try from_utf8 first (no allocation if valid), fall back to lossy
-        let stdout = match String::from_utf8(output.stdout) {
-            Ok(s) => s,
-            Err(e) => String::from_utf8_lossy(&e.into_bytes()).to_string(),
-        };
-        let stderr = match String::from_utf8(output.stderr) {
-            Ok(s) => s,
-            Err(e) => String::from_utf8_lossy(&e.into_bytes()).to_string(),
-        };
+        let stdout = Self::bytes_to_string(output.stdout);
+        let stderr = Self::bytes_to_string(output.stderr);
         let exit_code = output.status.code();
         let success = output.status.success();
 
