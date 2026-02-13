@@ -5,6 +5,7 @@
 
 use std::time::Duration;
 use statrs::statistics::{Data, OrderStatistics, Statistics as StatrsStatistics};
+use stats_ci::Confidence;
 
 /// A collection of data samples for statistical analysis
 #[derive(Debug, Clone)]
@@ -80,7 +81,7 @@ impl Sample {
             .collect()
     }
 
-    /// Calculate confidence interval using t-distribution
+    /// Calculate confidence interval using t-distribution via stats-ci
     pub fn confidence_interval(&self, confidence: f64) -> ConfidenceInterval {
         if self.len() < 2 {
             return ConfidenceInterval {
@@ -90,25 +91,40 @@ impl Sample {
             };
         }
 
-        let stats = Statistics::from_sample(self);
-        let mean = stats.mean.unwrap_or(0.0);
-        let std_dev = stats.std_dev.unwrap_or(0.0);
-        let n = self.len() as f64;
+        // Use stats-ci for accurate confidence interval calculation
+        // stats-ci uses Student's t-distribution up to ~100,000 samples, then normal distribution
+        let confidence_level = Confidence::new(confidence);
+        let result = stats_ci::mean::Arithmetic::ci(confidence_level, &self.data);
 
-        // Approximate t-value for common confidence levels
-        // For larger samples, this approaches the normal distribution
-        let t_value = match confidence {
-            c if (c - 0.90).abs() < 0.01 => 1.645,
-            c if (c - 0.95).abs() < 0.01 => 1.960,
-            c if (c - 0.99).abs() < 0.01 => 2.576,
-            _ => 1.96, // Default to 95%
-        };
-
-        let margin = t_value * std_dev / n.sqrt();
-        ConfidenceInterval {
-            confidence,
-            lower: mean - margin,
-            upper: mean + margin,
+        match result {
+            Ok(interval) => {
+                let lower = interval.low_f();
+                let upper = interval.high_f();
+                ConfidenceInterval {
+                    confidence,
+                    lower,
+                    upper,
+                }
+            }
+            Err(_) => {
+                // Fallback to simple calculation if stats-ci fails
+                let stats = Statistics::from_sample(self);
+                let mean = stats.mean.unwrap_or(0.0);
+                let std_dev = stats.std_dev.unwrap_or(0.0);
+                let n = self.len() as f64;
+                let t_value = match confidence {
+                    c if (c - 0.90).abs() < 0.01 => 1.645,
+                    c if (c - 0.95).abs() < 0.01 => 1.960,
+                    c if (c - 0.99).abs() < 0.01 => 2.576,
+                    _ => 1.96,
+                };
+                let margin = t_value * std_dev / n.sqrt();
+                ConfidenceInterval {
+                    confidence,
+                    lower: mean - margin,
+                    upper: mean + margin,
+                }
+            }
         }
     }
 
