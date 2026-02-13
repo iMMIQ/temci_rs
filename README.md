@@ -76,7 +76,7 @@ cargo install temci
 Execute a command and measure its execution time:
 
 ```bash
-temci short-exec echo "Hello, World!"
+temci short-exec 'echo "Hello, World!"'
 ```
 
 Run a benchmark with multiple executions:

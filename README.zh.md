@@ -76,7 +76,7 @@ cargo install temci
 执行命令并测量其执行时间：
 
 ```bash
-temci short-exec echo "Hello, World!"
+temci short-exec 'echo "Hello, World!"'
 ```
 
 运行多次执行的基准测试：

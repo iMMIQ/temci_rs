@@ -76,7 +76,7 @@ cargo install temci
 コマンドを実行して実行時間を測定します：
 
 ```bash
-temci short-exec echo "Hello, World!"
+temci short-exec 'echo "Hello, World!"'
 ```
 
 複数回実行するベンチマークを実行します：
