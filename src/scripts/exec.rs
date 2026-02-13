@@ -16,6 +16,7 @@ use tracing::{info, debug, warn};
 
 use crate::run::executor::{BenchmarkExecutor, BenchmarkConfig};
 use crate::run::report::{Report, FormatType};
+use crate::utils::time::duration_as_ms;
 
 /// Configuration loaded from a YAML file for benchmark execution
 #[derive(Debug, serde::Deserialize)]
@@ -259,13 +260,13 @@ fn print_quick_summary(name: &str, summary: &crate::run::executor::BenchmarkSumm
     println!("  Failed: {}", summary.failed_runs);
 
     if let Some(avg) = summary.avg_duration {
-        println!("  Avg: {:.2} ms", avg.as_secs_f64() * 1000.0);
+        println!("  Avg: {:.2} ms", duration_as_ms(&avg));
     }
     if let Some(min) = summary.min_duration {
-        println!("  Min: {:.2} ms", min.as_secs_f64() * 1000.0);
+        println!("  Min: {:.2} ms", duration_as_ms(&min));
     }
     if let Some(max) = summary.max_duration {
-        println!("  Max: {:.2} ms", max.as_secs_f64() * 1000.0);
+        println!("  Max: {:.2} ms", duration_as_ms(&max));
     }
 }
 
@@ -277,7 +278,7 @@ fn print_summary_report(report: &Report) {
     for (idx, summary) in report.entries().iter().enumerate() {
         println!("\n{}:", idx + 1);
         if let Some(avg) = summary.avg_duration {
-            println!("  Avg: {:.2} ms", avg.as_secs_f64() * 1000.0);
+            println!("  Avg: {:.2} ms", duration_as_ms(&avg));
         }
         println!("  Runs: {} successful", summary.successful_runs);
         if summary.failed_runs > 0 {

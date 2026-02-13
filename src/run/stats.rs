@@ -16,6 +16,7 @@
 use std::time::Duration;
 use statrs::statistics::{Data, OrderStatistics, Statistics as StatrsStatistics};
 use stats_ci::Confidence;
+use crate::utils::time::duration_as_ms;
 
 /// A collection of data samples for statistical analysis
 #[derive(Debug, Clone)]
@@ -33,7 +34,7 @@ impl Sample {
     pub fn from_durations(durations: Vec<Duration>) -> Self {
         let data = durations
             .iter()
-            .map(|d| d.as_secs_f64() * 1000.0)
+            .map(duration_as_ms)
             .collect();
         Self { data }
     }

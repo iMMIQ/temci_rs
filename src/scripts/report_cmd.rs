@@ -12,6 +12,7 @@ use tracing::{info, debug};
 
 use crate::run::report::{Report, FormatType};
 use crate::run::executor::BenchmarkSummary;
+use crate::utils::time::{duration_as_ms, duration_to_ms};
 
 /// Saved benchmark results that can be loaded from a file
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
@@ -177,10 +178,10 @@ pub fn save_results(
             runs: s.benchmark_runs.len(),
             successful: s.successful_runs,
             failed: s.failed_runs,
-            min_ms: s.min_duration.map(|d| d.as_secs_f64() * 1000.0),
-            max_ms: s.max_duration.map(|d| d.as_secs_f64() * 1000.0),
-            avg_ms: s.avg_duration.map(|d| d.as_secs_f64() * 1000.0),
-            total_ms: s.total_time.as_secs_f64() * 1000.0,
+            min_ms: s.min_duration.map(duration_to_ms),
+            max_ms: s.max_duration.map(duration_to_ms),
+            avg_ms: s.avg_duration.map(duration_to_ms),
+            total_ms: duration_as_ms(&s.total_time),
         })
         .collect();
 

@@ -7,6 +7,7 @@
 
 use crate::run::executor::BenchmarkSummary;
 use crate::run::stats::{Sample, Statistics};
+use crate::utils::time::duration_as_ms;
 use serde::Serialize;
 
 /// Output format types for reports
@@ -189,7 +190,7 @@ impl Report {
                     .iter()
                     .filter_map(|r| {
                         if r.is_success() {
-                            Some(r.result.duration.as_secs_f64() * 1000.0)
+                            Some(duration_as_ms(&r.result.duration))
                         } else {
                             None
                         }
@@ -208,7 +209,7 @@ impl Report {
                     min_duration_ms: stats.min,
                     max_duration_ms: stats.max,
                     avg_duration_ms: stats.mean,
-                    total_time_ms: s.total_time.as_secs_f64() * 1000.0,
+                    total_time_ms: duration_as_ms(&s.total_time),
                 }
             })
             .collect();
@@ -231,7 +232,7 @@ impl Report {
                 .iter()
                 .filter_map(|r| {
                     if r.is_success() {
-                        Some(r.result.duration.as_secs_f64() * 1000.0)
+                        Some(duration_as_ms(&r.result.duration))
                     } else {
                         None
                     }
@@ -249,7 +250,7 @@ impl Report {
                 stats.min.map_or("".to_string(), |v| v.to_string()),
                 stats.max.map_or("".to_string(), |v| v.to_string()),
                 stats.mean.map_or("".to_string(), |v| v.to_string()),
-                summary.total_time.as_secs_f64() * 1000.0,
+                duration_as_ms(&summary.total_time),
             ));
         }
 

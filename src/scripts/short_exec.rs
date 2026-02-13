@@ -10,6 +10,7 @@ use tracing::{info, debug};
 
 use crate::run::executor::{BenchmarkExecutor, BenchmarkConfig};
 use crate::run::stats::{Sample, Statistics};
+use crate::utils::time::duration_as_ms;
 
 /// Quick execution of commands with simple statistics
 ///
@@ -62,7 +63,7 @@ pub async fn short_exec(
                     .iter()
                     .filter_map(|r| {
                         if r.is_success() {
-                            Some(r.duration().as_secs_f64() * 1000.0)
+                            Some(duration_as_ms(&r.duration()))
                         } else {
                             None
                         }
@@ -156,7 +157,7 @@ fn print_detailed_result(result: &CommandBenchmarkResult) {
         }
     }
 
-    println!("  Total:   {:.2} ms", summary.total_time.as_secs_f64() * 1000.0);
+    println!("  Total:   {:.2} ms", duration_as_ms(&summary.total_time));
 }
 
 /// Print a comparison summary for all commands
