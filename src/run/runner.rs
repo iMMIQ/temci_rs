@@ -245,37 +245,62 @@ impl Runner for CommandRunner {
 
         debug!("Executing async command: {:?}", cmd);
 
-        let output_future = cmd.output();
+        // Spawn the command to get a Child object, which allows us to kill it on timeout
+        let mut child = cmd
+            .spawn()
+            .map_err(|e| TemciError::ExecutionError(format!("Async execution failed: {}", e)))?;
 
-        let output = if let Some(dur) = &self.timeout {
-            match tokio_timeout(*dur, output_future).await {
-                Ok(Ok(out)) => out,
+        // Take ownership of stdout and stderr before waiting
+        let mut stdout_reader = child.stdout.take().expect("stdout not captured");
+        let mut stderr_reader = child.stderr.take().expect("stderr not captured");
+
+        let (stdout_bytes, stderr_bytes, exit_code, success) = if let Some(dur) = &self.timeout {
+            // Wait with timeout - if timeout occurs, we still have child to kill
+            match tokio_timeout(*dur, child.wait()).await {
+                Ok(Ok(status)) => {
+                    // Process completed within timeout - collect output
+                    use tokio::io::AsyncReadExt;
+
+                    let mut stdout_buf = Vec::new();
+                    let mut stderr_buf = Vec::new();
+                    let _ = stdout_reader.read_to_end(&mut stdout_buf).await;
+                    let _ = stderr_reader.read_to_end(&mut stderr_buf).await;
+
+                    let exit_code = status.code();
+                    let success = status.success();
+                    (stdout_buf, stderr_buf, exit_code, success)
+                }
                 Ok(Err(e)) => {
                     return Err(TemciError::ExecutionError(format!("Async execution failed: {}", e)));
                 }
                 Err(_) => {
-                    // Timeout occurred
+                    // Timeout occurred - kill the child process
+                    let _ = child.kill().await;
+                    let _ = child.wait().await;
                     return Ok(CommandResult {
                         stdout: String::new(),
                         stderr: String::new(),
                         exit_code: None,
-                        duration: start.elapsed(),
+                        duration: *dur,
                         timeout: true,
                         success: false,
                     });
                 }
             }
         } else {
-            output_future
+            // No timeout - use wait_with_output which takes ownership
+            let output = child.wait_with_output()
                 .await
-                .map_err(|e| TemciError::ExecutionError(format!("Async execution failed: {}", e)))?
+                .map_err(|e| TemciError::ExecutionError(format!("Async execution failed: {}", e)))?;
+
+            let exit_code = output.status.code();
+            let success = output.status.success();
+            (output.stdout, output.stderr, exit_code, success)
         };
 
         let duration = start.elapsed();
-        let stdout = Self::bytes_to_string(output.stdout);
-        let stderr = Self::bytes_to_string(output.stderr);
-        let exit_code = output.status.code();
-        let success = output.status.success();
+        let stdout = Self::bytes_to_string(stdout_bytes);
+        let stderr = Self::bytes_to_string(stderr_bytes);
 
         debug!("Async command completed in {:?}", duration);
 
