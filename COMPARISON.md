@@ -58,23 +58,23 @@ The Rust implementation (temci-rs) is a complete rewrite of the original Python 
 All benchmarks were run on the same machine using `hyperfine`. Results below show actual measured values.
 
 ### Startup Time (`--help` command)
-- **Python**: 852.0 ms ± 39.1 ms
+- **Python**: 824.4 ms ± 6.1 ms
 - **Rust**: 1.5 ms ± 0.2 ms
-- **Speedup**: ~570x faster
+- **Speedup**: ~541x faster
 
 ### Execution Overhead (100 runs of `true`)
-- **Python**: 4.921 s ± 0.113 s
-- **Rust**: 42.0 ms ± 1.4 ms
-- **Speedup**: ~117x faster
+- **Python**: 4.904 s ± 0.085 s
+- **Rust**: 40.4 ms ± 0.8 ms
+- **Speedup**: ~121x faster
 
 ### Memory Usage (Maximum Resident Set Size)
-- **Python**: 151,056 KB (~147 MB)
-- **Rust**: 4,608 KB (~4.5 MB)
+- **Python**: 151,652 KB (~148 MB)
+- **Rust**: 4,652 KB (~4.5 MB)
 - **Reduction**: ~33x less memory
 
 ### Binary Size
 - **Python**: 328 bytes (script) + ~387 MB dependencies
-- **Rust**: 4.7 MB static binary (no external dependencies)
+- **Rust**: 4.9 MB static binary (no external dependencies)
 
 ### Statistical Calculations
 - **Python**: Uses numpy/pandas for statistics
@@ -272,10 +272,10 @@ Test environment: Linux, temci 0.8.5 (Python), temci-rs (Rust)
 ## Conclusion
 
 The Rust implementation provides:
-- **570x faster** startup time (1.5ms vs 852ms)
-- **117x faster** benchmark execution (42ms vs 4921ms for 100 runs)
-- **33x smaller** memory footprint (4.5MB vs 147MB)
-- **Standalone** 4.7MB binary vs ~387MB Python dependencies
+- **541x faster** startup time (1.5ms vs 824ms)
+- **121x faster** benchmark execution (40ms vs 4904ms for 100 runs)
+- **33x smaller** memory footprint (4.5MB vs 148MB)
+- **Standalone** 4.9MB binary vs ~387MB Python dependencies
 - **Type-safe** development with compile-time guarantees
 - **Compatible** configuration and result formats (planned)
 - **Modern** CLI with better error messages
