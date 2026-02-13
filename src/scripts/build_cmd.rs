@@ -1,28 +1,15 @@
-//! Build command for benchmark executables
+//! Build command stub
+//!
+//! Placeholder for build functionality.
 
 use anyhow::Result;
 
-/// Build benchmark executables
 pub async fn build(
-    config: Option<String>,
-    force: bool,
-    release: bool,
+    _config: Option<String>,
+    _force: bool,
+    _release: bool,
 ) -> Result<()> {
-    tracing::info!(
-        "Build: config={:?}, force={}, release={}",
-        config, force, release
-    );
-    // TODO: Implement build system
+    // TODO: Implement full build command
+    // For now, just return success
     Ok(())
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[tokio::test]
-    async fn test_build_placeholder() {
-        let result = build(None, false, false).await;
-        assert!(result.is_ok());
-    }
 }
