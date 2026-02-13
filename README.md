@@ -57,7 +57,7 @@ temci allows you to:
 ### From Source
 
 ```bash
-git clone https://github.com/yourusername/temci_rs.git
+git clone https://github.com/iMMIQ/temci_rs.git
 cd temci_rs
 cargo build --release
 sudo install target/release/temci /usr/local/bin/
