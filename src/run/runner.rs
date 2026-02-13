@@ -309,16 +309,15 @@ impl PerfRunner {
     }
 
     /// Build a perf stat command
-    fn build_perf_command(&self, program: &str, args: &[&str]) -> Vec<String> {
-        let mut cmd = vec![
-            "perf".to_string(),
-            "stat".to_string(),
-            "-x,".to_string(),  // CSV output
-            "-e".to_string(),
-            self.events.join(","),
-            "--".to_string(),
-            program.to_string(),
-        ];
+    pub(crate) fn build_perf_command(&self, program: &str, args: &[&str]) -> Vec<String> {
+        let mut cmd = Vec::with_capacity(6 + args.len());
+        cmd.push("perf".to_string());
+        cmd.push("stat".to_string());
+        cmd.push("-x,".to_string());  // CSV output
+        cmd.push("-e".to_string());
+        cmd.push(self.events.join(","));
+        cmd.push("--".to_string());
+        cmd.push(program.to_string());
         cmd.extend(args.iter().map(|s| s.to_string()));
         cmd
     }
@@ -414,5 +413,18 @@ mod tests {
 
         assert_eq!(result.stdout, "valid utf8 é");
         assert_eq!(result.stderr, "error message");
+    }
+
+    #[test]
+    fn test_perf_command_building() {
+        let runner = PerfRunner::new();
+        let cmd = runner.build_perf_command("echo", &["hello", "world"]);
+
+        assert_eq!(cmd[0], "perf");
+        assert_eq!(cmd[1], "stat");
+        assert_eq!(cmd[2], "-x,");
+        assert!(cmd.contains(&"echo".to_string()));
+        assert!(cmd.contains(&"hello".to_string()));
+        assert!(cmd.contains(&"world".to_string()));
     }
 }
