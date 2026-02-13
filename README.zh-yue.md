@@ -82,7 +82,7 @@ temci short-exec 'echo "Hello, World!"'
 運行多次執行嘅基準測試：
 
 ```bash
-temci exec sleep 1
+temci short-exec --runs 20 'sleep 1'
 ```
 
 ### 基準測試設定
@@ -125,14 +125,6 @@ temci report --output results.txt
 temci report --format json --output results.json
 temci report --format csv --output results.csv
 temci report --format markdown --output results.md
-```
-
-### CPU 親和性控制
-
-將執行綁定到特定嘅 CPU 核心：
-
-```bash
-temci short-exec --cpus 0,1 your_command
 ```
 
 ### 構建整合

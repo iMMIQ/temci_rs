@@ -82,7 +82,7 @@ temci short-exec 'echo "Hello, World!"'
 Run a benchmark with multiple executions:
 
 ```bash
-temci exec sleep 1
+temci short-exec --runs 20 'sleep 1'
 ```
 
 ### Benchmark Configuration
@@ -125,14 +125,6 @@ temci report --output results.txt
 temci report --format json --output results.json
 temci report --format csv --output results.csv
 temci report --format markdown --output results.md
-```
-
-### CPU Affinity Control
-
-Pin execution to specific CPU cores:
-
-```bash
-temci short-exec --cpus 0,1 your_command
 ```
 
 ### Build Integration

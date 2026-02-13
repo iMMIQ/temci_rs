@@ -82,7 +82,7 @@ temci short-exec 'echo "Hello, World!"'
 複数回実行するベンチマークを実行します：
 
 ```bash
-temci exec sleep 1
+temci short-exec --runs 20 'sleep 1'
 ```
 
 ### ベンチマーク設定
@@ -125,14 +125,6 @@ temci report --output results.txt
 temci report --format json --output results.json
 temci report --format csv --output results.csv
 temci report --format markdown --output results.md
-```
-
-### CPUアフィニティ制御
-
-特定のCPUコアに実行を固定します：
-
-```bash
-temci short-exec --cpus 0,1 your_command
 ```
 
 ### ビルド統合
